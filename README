@@ -11,6 +11,7 @@ User guide is found in readme.html.
 
 System requirements:
 For compiling:	C++ compiler, C++ Standard Library with Standard Templates.
+For compiling the docs: Texinfo. If not present, use "make antic jlint".
 For using:	Any Java compiler (no Java Run Time Environment needed).
 
 Installation:
