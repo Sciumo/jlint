@@ -815,6 +815,13 @@ void method_desc::parse_code(class_desc* this_class,
       sp->min  = vars[*pc].min;
       sp->max  = vars[*pc].max;
       sp->equals = vars[*pc].equals;
+#ifdef DUMP_STACK
+        printf("<stack_top> := %x %s\n",
+               (int)sp->equals,
+               sp->equals == NULL ? 
+               "<unknown>" : sp->equals->name.as_asciz()
+               );
+#endif
       sp->index = *pc++;
       sp += 1;
       break;
@@ -926,7 +933,6 @@ void method_desc::parse_code(class_desc* this_class,
     case aload_3:
       { 
         var_desc* var = &vars[cop - aload_0];
-        sp->equals = vars[cop - aload_0].equals;
         if (var->type == tp_void) { 
           if (cop == aload_0 && !(attr & m_static)) { 
             var->type = tp_self;
@@ -943,9 +949,9 @@ void method_desc::parse_code(class_desc* this_class,
         sp->min  = var->min;
         sp->max  = var->max;
         sp->index = cop - aload_0;
+        sp->equals = vars[cop - aload_0].equals;
 #ifdef DUMP_STACK
-        printf("<stack_top_%d> := %x %s\n",
-               cop-aload_0,
+        printf("<stack_top> := %x %s\n",
                (int)sp->equals,
                sp->equals == NULL ? 
                "<unknown>" : sp->equals->name.as_asciz()
@@ -1023,6 +1029,17 @@ void method_desc::parse_code(class_desc* this_class,
       if (vars[*pc].type == tp_void) { 
         vars[*pc].type = tp_object;
       }
+      vars[*pc].equals = sp->equals;
+#ifdef DUMP_STACK
+      for (i = 0; i <= *pc; i++) {
+        printf("<var_%d> := %x %s\n",
+               i,
+               (int)vars[i].equals,
+               vars[i].equals == NULL ? 
+               "<unknown>" : vars[i].equals->name.as_asciz()
+               );
+      }
+#endif
       pc += 1;
       break;
     case fstore:
@@ -2542,20 +2559,7 @@ void method_desc::parse_code(class_desc* this_class,
                  sp->equals->name.as_asciz()
                  );
 #endif  
-        } else { // work around bug: in java.awt.EventQueue::invokeAndWait(Runnable), stack pointer points to wrong element on stack!
-          ++sp;
-          if (sp->equals != NULL) {
-            this_class->monitors.insert(monitor_table::value_type(sp->equals->name.as_asciz(), 1));
-          }
-#ifdef DUMP_MONITOR
-          printf("%s acquires lock on %s\n", 
-                 this_class->name.as_asciz(),
-                 sp->equals == NULL ? 
-                 "<unknown>" : sp->equals->name.as_asciz()
-                 );
-#endif  
-          --sp;
-        } // end of workaround
+        }
       }    
       break;
     case monitorexit:
