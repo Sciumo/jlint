@@ -1,7 +1,7 @@
 \documentclass[11pt,twoside,a4paper,draft]{article}
 \usepackage{verbatim}
 \author{Raphael Ackermann raphy@student.ethz.ch}
-\title{Jlint}
+\title{Jlint -- status of version 3.0}
 \begin{document}
 \maketitle
 
@@ -18,11 +18,11 @@ It can be found at the following URL's:
 http://www.artho.com/jlint/ \newline
 http://www.sf.org/jlint/ \newline
 
-The development activity of \texttt{jlint} has been very low in the last two years.
-At the same time a new version of the gnu compiler g++ 3.X and a new java
-version 1.4 became quite popular. Java 1.4 introduced some changes in the way
-java programs were compiled. These changes caused a crash in \texttt{jlint}
-when analyzing certain class files. Furthermore, jlint's sources couldn't be
+The development activity of \texttt{jlint} has been very low in the last two
+years. At the same time a new version of the gnu compiler g++ 3.X and a new
+java version 1.4 became quite popular. Java 1.4 introduced some changes in the
+way java programs were compiled. These changes caused a crash in \texttt{jlint}
+when analysing certain class files. Furthermore, jlint's sources couldn't be
 be compiled using the new g++ 3.x compiler and therefore in a first step the
 sources had to be changed to allow compilation using a new gnu compiler. In a
 second step the bug was to be fixed.
@@ -36,7 +36,7 @@ of valgrind.
 Such a long time of almost no development is of course not wanted and
 a broader basis and more active development on jlint was looked for.
 It is hoped that this goal will be reached by moving the CVS repositories 
-and the webpage to www.sourceforge.net where everybody can contribute 
+and the web page to www.sourceforge.net where everybody can contribute 
 to the further development of jlint.
 While fixing the bug, a test framework was developed which supports
 regression testing on new versions and different platforms.
@@ -52,10 +52,13 @@ during development. Such a framework can consist of several kind of tests.
 
 The one test pattern we will look at here is regression tests. In a regression 
 test you need to have a predefined behaviour and output of your program before
-actually running any tests. The goal is then that on every platform and for every future version of the program the output machtes the specified output and that the program works in a predefined manner.
+actually running any tests. The goal is then that on every platform and for 
+every future version of the program the output matches the specified output 
+and that the program works in a predefined manner.
 
 
-Testing on different platforms is important because e.g., Macintosh computers use a different memory alignement than windows IA32 architectures.
+Testing on different platforms is important because e.g., Macintosh computers 
+use a different memory alignment than windows IA32 architectures.
 
 
 Running the test framework after every change in the source code and checking
@@ -71,11 +74,12 @@ box testing and white box testing.
 Black box testing as it was added to \texttt{jlint} in this semester project 
 works roughly like this:
 
-You need a number of different inputs, the test cases. A correct version of the 
-program is then used to create the predefined outputs and indicated above. The inputs should never change, once they do, you will have to create new outputs.
-The created output files are saved and are referred to as reference outputs.
-They specify the desired output shich should be matched by future versions of
-your program.
+You need a number of different inputs, the test cases. A correct version of 
+the program is then used to create the predefined outputs and indicated above.
+The inputs should never change, once they do, you will have to create new 
+outputs. The created output files are saved and are referred to as reference 
+outputs. They specify the desired output which should be matched by future 
+versions of your program.
 
 \begin{verbatim}
 create test framework               run test framework
@@ -99,12 +103,12 @@ create test framework               run test framework
 Imagine you change some part of your program and want to know if it 
 still works correctly. Just run your test framework with the input files
 and compare your output with the reference output. In case the two
-outputs are not identical, you will have to analyze the changes 
+outputs are not identical, you will have to analyse the changes 
 made in your program.
 
 There are two possibilities now. Either your changes have undesired
-sideeffects and you have to implement the changes in some other 
-way. This is the more common case. Or you have changed someting
+side effects and you have to implement the changes in some other 
+way. This is the more common case. Or you have changed something
 in the logic of your program and you know that your new input is
 valid and correct. Then you have to change your test framework
 to include the new output as the new reference output.
@@ -176,7 +180,7 @@ test4 sample from java/io/* (1.4)
 Usage:
 ------
 
-  To run testsuite using valgrind, 
+  To run test suite using valgrind, 
 	try "./testall.sh --valgrind"
 
   For info on how to run tests, 
@@ -191,7 +195,7 @@ Usage:
 % ##########################################################################
 
 Adding new test cases to the test framework is quite simple. A new directory
- e.g., test5 has to be created and the classfiles to be tested must be copied
+ e.g., test5 has to be created and the class files to be tested must be copied
  into that directory. In file \texttt{testall.sh} the variable
  \texttt{NROFTESTS} which is currently set to 4 has to be changed to reflect 
 the new number of test cases. First of all a new reference file e.g., 5.out
@@ -214,13 +218,14 @@ difficulties verifying the correctness of exception handlers with a complex
 control flow. These complex exception handlers were the result of a 
 try--finally or a try--catch--finally construct.
 
-Starting with \texttt{java 1.4} this bug in the virtual machine was worked around by
-changing the compiler. The generated byte code remains the same, but the number
-and the range of the exception handlers was changed in case there is a
-finally statement in the code. 
+Starting with \texttt{java 1.4} this bug in the virtual machine was worked 
+around by changing the compiler. The generated byte code remains the same, but
+the number and the range of the exception handlers was changed in case there 
+is a finally statement in the code. 
 
 Below you can see a java source file, followed by the corresponding byte code
-and the exception table. Differences between \texttt{java 1.3} and \texttt{java 1.4} will be pointed out.
+and the exception table. Differences between \texttt{java 1.3} and 
+\texttt{java 1.4} will be pointed out.
 
 \begin{verbatim}
 class SC {
@@ -263,9 +268,9 @@ Code(max_stack = 1, max_locals = 4, code_length = 26)
 
 \end{verbatim}
 
-In this code, compiled by \texttt{javac 1.3}, there is only one exception handler
-which is valid for lines 0 to 14 exclusive. This means it catches
-exceptions occuring on lines 0 to and including 11. Whereas in the
+In this code, compiled by \texttt{javac 1.3}, there is only one exception 
+handler which is valid for lines 0 to 14 exclusive. This means it catches
+exceptions occurring on lines 0 to and including 11. Whereas in the
 exception table below, compiled by \texttt{javac 1.4} there is also
 just one exception handler. But the range is split twice.
 Lines 7 and 11, the ``return'' and the ``goto'' instruction
@@ -297,15 +302,16 @@ bug was fixed in jlint version 3.0.
 \subsection {Context Handling in \texttt{Jlint}}
 % ##########################################################################
 
-In its analysis of the class file jlint goes through the bytecode calculating
+In its analysis of the class file jlint goes through the byte code calculating
 the range of possible values for each variable. For this a context 
-datastructure is used. In this context datastructure the range of 
+data structure is used. In this context data structure the range of 
 values a variable  can have is saved. Contexts can be created, split and 
-merged. Every bytecode adress has a linked list of contexts.
+merged. Every byte code address has a linked list of contexts.
 
 In the code fragment below which is from file \texttt{jlint.cc} for 
 every entry in the exception table, such a context is inserted into the linked
-list at position ``handler\_pc'' by calling ``ctx\_entry\_point(\&method-\verb+>+context[handler\_pc]);''.
+list at position ``handler\_pc'' by calling 
+``ctx\_entry\_point(\&method-\verb+>+context[handler\_pc]);''.
 \begin{verbatim}
 while (--exception_table_length >= 0)
 { 
@@ -314,20 +320,20 @@ while (--exception_table_length >= 0)
       fp += 8;
 }
 \end{verbatim}
-After that the byte code instructions are analyzed in jlint. Whenever 
+After that the byte code instructions are analysed in jlint. Whenever 
 \texttt{Jlint} starts the analysis of a new instruction, it goes through the
-linked list shich corresponds to the instruction beeing analyzed. The 
-stackpointer is increased by one for each of the contexts found in the list.
+linked list which corresponds to the instruction being analysed. The 
+stack pointer is increased by one for each of the contexts found in the list.
 If for example there is an exception handler at position 14 which handles
-Exception $n > 1$. Then the linked list of position 14 has $n$ entrypoint
-contexts amongst possibly other contexts. And so the stackpointer has been
-increased by $n$ instead of only one. The problem here is that the stackpointer
-will only be reduced by one because there is only one exception 
+Exception $n > 1$. Then the linked list of position 14 has $n$ entry point
+contexts amongst possibly other contexts. And so the stack pointer has been
+increased by $n$ instead of only one. The problem here is that the stack 
+pointer will only be reduced by one because there is only one exception 
 handler in the byte code at a specific position, even if there is more than 
 one range for the same exception handler. And so there is only one 
 \texttt{astore} instruction
-where jlint will decrease the stackpointer by one. Therefore after adding more
-than one exception context at the same byte code adress the final assertion
+where jlint will decrease the stack pointer by one. Therefore after adding more
+than one exception context at the same byte code address the final assertion
 sp == stack\_bottom fails and jlint returns with an error.
 
 \begin{verbatim}
@@ -342,8 +348,8 @@ t1	t2       t3      t4      t5     t6
 \end{verbatim}
 
 
-At time t2 the exception is stored and the stackpointer is decreased by one.
-But the stackpointer is still 2 positions too high and it will remain too high
+At time t2 the exception is stored and the stack pointer is decreased by one.
+But the stack pointer is still 2 positions too high and it will remain too high
 until the end, where the assertion assert(sp == stack\_bottom) will fail.
 
 % ##########################################################################
@@ -352,9 +358,9 @@ until the end, where the assertion assert(sp == stack\_bottom) will fail.
 
 This bug caused jlint to exit abnormally under certain circumstances.
 Two different assertions could be violated because the simulated stack
-management didn't work properly anymore. 
+management didn't work properly any more. 
 
-The First kind of error occured e.g., when analyzing file \newline
+The First kind of error occurred e.g., when analysing file \newline
 \texttt{/java/io/BufferedReader.class}.
 
 \begin{verbatim}
@@ -364,7 +370,7 @@ in method:  parse_code(constant **, const field_desc *)
 Aborted
 \end{verbatim}
 
-The Second kind of error occured e.g., when analyzing file \newline
+The Second kind of error occurred e.g., when analysing file \newline
 \texttt{/java/lang/FloatingDecimal.class}.
 
 \begin{verbatim}
@@ -380,7 +386,7 @@ Aborted
 
 Below is the listing of a minimal java class file which caused jlint to abort.
 This class file does not have a meaning, but still it is valid and gives a
-classfile with a minimal number of byte code instructions. 
+class file with a minimal number of byte code instructions. 
 
 \begin{verbatim}
 class SC {
@@ -394,7 +400,7 @@ class SC {
 
 
 % ##########################################################################
-\subsection {Bugfix}
+\subsection {Bug fix}
 % ##########################################################################
 
 Here is the diff of the old and the new version of \texttt{jlint.cc}:
@@ -410,7 +416,7 @@ diff -u jlint_old.cc jlint.cc
  
          int exception_table_length = unpack2(fp); fp += 2;
 +
-+       /* add new entry for each distinct "byte code adress 
++       /* add new entry for each distinct "byte code address 
 +       ** of handle".
 +       **
 +       ** if an exception handler at byte code "pos" handles
@@ -420,7 +426,7 @@ diff -u jlint_old.cc jlint.cc
 +       ** control. 
 +       **
 +       ** in the following example there are two different
-+       ** handle adresses 16 and 25. and for each of them 
++       ** handle addresses 16 and 25. and for each of them 
 +       **"new ctx_entry_point(&method->context[handler_pc]);"
 +       ** is called exactly once. Therefore the program calls
 +       ** new ctx_entry_point(&method->context[16]);
@@ -429,14 +435,14 @@ diff -u jlint_old.cc jlint.cc
 +       ** Example Exception Table:                         **
 +       ** -------------------------------------            **
 +       **                                                  **
-+       **                      byte code adress            **
++       **                      byte code address            **
 +       ** from         to        of handle                 **
 +       **  2           10           16                     **
 +       ** 12           14           16                     **
 +       ** 20           23           25                     **
 +       ******************************************************
 +       **
-+       ** it is expected that the byte code adresses of the
++       ** it is expected that the byte code addresses of the
 +       ** handles are ordered. If this would not be the case,
 +       ** a simple comparison of handler_pc and 
 +       ** old_handler_pc would not be sufficient!
@@ -477,7 +483,7 @@ it calculates.
 
 The new target test\_dist was added to the \texttt{Makefile}. 
 ''make test\_dist'' builds a tar.gz of the sources including the test 
-directory with all the testfiles. It is intended to be used by future 
+directory with all the test files. It is intended to be used by future 
 developers of \texttt{jlint} to be able to check for errors.
 
 % ##########################################################################
@@ -495,7 +501,8 @@ should make it easier to check for errors in the future.
 
 The configure script should be improved and support for other architectures as
 well as other operating systems should be added. The cvs repository should be
-moved to the sourceforge account. Support for 64-bit architectures needs to be implemented as well. The valgrind tests in the test framework
+moved to the sourceforge account. Support for 64-bit architectures needs to be
+implemented as well. The valgrind tests in the test framework
 don't really work yet. The problem is how to run valgrind with shell scripts.
 Some more things which one could add to improve jlint and to fix some open bugs
 can be found in the files BUGS and TODO which come with \texttt{jlint}.

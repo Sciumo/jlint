@@ -27,7 +27,6 @@ CPP=g++
 CFLAGS = -c -Wall -O2 -g
 # -DSLIST removed because it wouldn't compile under gcc 3.x
 # add -DHASH_TABLE for extra speed (may sometimes produce inconsistent results)
-# you may have to add -march=i486  if using gcc 3.3, due to a bug in libstdc++
 
 # Optimized version with switched off asserts
 #CFLAGS = -c -Wall -O2 -g -DSLIST -DNDEBUG
@@ -45,7 +44,7 @@ VERSION=3.0
 # Files that go into distro
 DISTFILES=`ls jlint-$(VERSION)/{antic.c,BUGS,Makefile,*.msg,*.hh,*.cc,*.d,README,TODO,CHANGELOG,COPYING,manual.texi,manual.html,manual.pdf,jlint.sh,mkmf.pl}`
 
-TESTDISTFILES=`ls jlint-$(VERSION)/{antic.c,BUGS,Makefile,*.msg,*.hh,*.cc,*.d,README,TODO,CHANGELOG,COPYING,manual.texi,manual.html,manual.pdf,jlint.sh,mkmf.pl,runtest.sh,showdiff.sh,showerror.sh,testall.sh,README.tests,tests.tar.bz2}`
+TESTDISTFILES=`ls jlint-$(VERSION)/{antic.c,BUGS,Makefile,*.msg,*.hh,*.cc,*.d,README,TODO,CHANGELOG,COPYING,manual.texi,manual.html,manual.pdf,jlint_3.0.tex,jlint.sh,mkmf.pl,runtest.sh,showdiff.sh,showerror.sh,testall.sh,README.tests,tests.tar.bz2}`
 
 
 
@@ -60,7 +59,7 @@ antic: antic.o
 	$(CC) $(LFLAGS) -o antic antic.o
 
 clean: 
-	rm -f  *.o *.exe core *~ *.his *.class jlint antic manual.{html,pdf,aux,cp,fn,ky,log,pg,toc,tp,vr}
+	rm -f  *.o *.exe core *~ *.his *.class jlint antic manual.{html,pdf,aux,cp,fn,ky,log,pg,toc,tp,vr} jlint_3.0.{aux,dvi,log,toc}
 	if [ -d ./tests/log ]; then rm -f ./tests/log/*~ ./tests/log/*.{err,errfiles,log}; rm -f ./tests/log/test.{diff,err}; fi
 	if [ -d ./tests ]; then rm -f ./tests/*~ tests.tar.bz2; fi
 

@@ -196,7 +196,7 @@ Multi-byte character constants are possible in C, but makes program non-portable
 
 It is difficult to distinct lower case letter 'l' and digit '1'. As far as 
 letter 'l' can be used as long modifier at the end of integer constant, 
-it can be mixed with digit. It is better to use uppercase 'L':
+it can be mixed with digit. It is better to use upper-case 'L':
 
 @example
     long l = 0x111111l;
@@ -439,7 +439,7 @@ into several categories, which contains one or more messages.
 Such scheme of message classification is used to support
 fine-grained selection of reported messages.
 
-Because only categories of message can be disabled, but not seperate messages, a short shell script is supplied that will suppress certain warnings that are less important. It should be noted that it will ignore any race conditions for variables. This is because Jlint does not have any notion of "shared reading", so it usually produces too many warnings about such data races to be useful. For some projects, using Jlint's output unfiltered can still be useful.
+Because only categories of message can be disabled, but not separate messages, a short shell script is supplied that will suppress certain warnings that are less important. It should be noted that it will ignore any race conditions for variables. This is because Jlint does not have any notion of "shared reading", so it usually produces too many warnings about such data races to be useful. For some projects, using Jlint's output unfiltered can still be useful.
 
 The shell script is as follows:
 @example
@@ -467,7 +467,7 @@ notification of some condition.
 Unfortunately, providing these synchronization primitives, Java compiler
 and virtual machine are not able to detect or prevent synchronization problems.
 Synchronization bugs are the most difficult bugs, because of non-deterministic
-behavior of multi-threaded program. There are two main sources of 
+behaviour of multi-threaded program. There are two main sources of 
 synchronization problems: deadlocks and race conditions.
 
 Situation in which one or more threads mutually lock each other is called 
@@ -611,7 +611,7 @@ There is another source of deadlock - execution of @code{wait()} method.
 This method unlocks monitor of current object and waits until some other thread
 notify it. Both methods @code{wait()} and @code{notify()}
 should be called with monitor locked. When thread is awaken from wait state,
-it tries to reestablish monitor lock and only after it can continue 
+it tries to re-establish monitor lock and only after it can continue 
 execution. The problem with @code{wait()} is that only one monitor is 
 unlocked. If method executing @code{wait()} was invoked from synchronized
 method of some other object O, monitor of this object O will not be released by
@@ -1641,7 +1641,7 @@ Jlint or AntiC as compiler. You can change prefix @var{MSG_LOCATION_PREFIX}
 <a href="types.hh">types.hh</a>
 @end ifhtml
 @file{types.hh}) from @var{"%0s:%1d: "} 
-to one recognized by your favorite editor or IDE. All Jlint messages are
+to one recognized by your favourite editor or IDE. All Jlint messages are
 gathered in file
 @ifhtml
 <a href="jlint.msg">jlint.msg</a>
@@ -1687,7 +1687,7 @@ MA 02111-1307, USA.
 @c I will be also very glad if somebody add some more stuff to Jlint or
 @c integrate it with some popular software development tools.
 @c Also modification of texts of reported messages 
-@c in order to make them more clear (sorry, english is not my native language) or 
+@c in order to make them more clear (sorry, English is not my native language) or 
 @c localization to some other languages are welcome.
 @c It can be also interesting to port Jlint to Java.
  

@@ -25,8 +25,8 @@
 
 extern "C"
 {
-  //#include <zlib.h>        // should I use <zlib.h> or "zlib.h" ??
-   #include "zlib.h"
+#include <zlib.h>        // should I use <zlib.h> or "zlib.h" ??
+  // #include "zlib.h"
 };
 
 bool   verbose = false;
@@ -785,9 +785,7 @@ void proceed_file(char* file_name, bool recursive = false)
 
       int filename_offset = CREC_SIZE+4;
 
-      // value unknown. have to ask Mark Wutka
-      //      if (compression_method C_UNCOMPRESSED)
-      if (compression_method != C_DEFLATE)
+      if (compression_method == C_UNCOMPRESSED)
 	{
           if (uncompressed_size != 0) { 
             byte* buffer = new byte[uncompressed_size];

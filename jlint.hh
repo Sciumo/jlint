@@ -101,5 +101,6 @@ enum const_types {
 
 // -- possible values at place C_COMPRESSION_METHOD
 #      define C_DEFLATE                         8
+#	define C_UNCOMPRESSED			0
 
 #endif
