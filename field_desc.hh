@@ -1,6 +1,11 @@
 #ifndef FIELD_DESC_HH
 #define FIELD_DESC_HH
 
+#ifdef VISUAL_CPP
+using namespace std;
+#pragma warning (disable : 4786)
+#endif
+
 #include "component_desc.hh"
 #include "utf_string.hh"
 class const_name_and_type;

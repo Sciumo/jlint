@@ -54,7 +54,9 @@ unsigned int string_hash_function(byte* p) {
   return h;
 }
 
+#ifndef VISUAL_CPP
 message_node* message_node::hash_table[1023];
+#endif
 
 //
 // Functions for extracting information from type descriptors

@@ -5,13 +5,24 @@
 
 #include "stdio.h"
 #include "types.hh"
+#include <stdarg.h>
 class utf_string;
 
-// cygwin fix:
 #ifndef __VALIST
 #ifdef va_list
 #define __VALIST va_list
-#else
+#endif
+// FreeBSD uses typedef in stdarg.h
+#ifdef __FreeBSD__
+#define __VALIST va_list
+#endif
+// so does MSVC++
+#ifdef VISUAL_CPP
+#define __VALIST va_list
+#endif
+
+// Fix for cygwin (and possible others), if va_list typedef'd or undefined
+#ifndef __VALIST
 #define __VALIST void*
 #endif
 #endif

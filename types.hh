@@ -1,6 +1,11 @@
 #ifndef TYPES_HH
 #define TYPES_HH
 
+#ifdef VISUAL_CPP
+#include <assert.h>
+#pragma warning( disable : 4786)
+#endif
+
 #include <string>
 #include <vector>
 

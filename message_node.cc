@@ -1,6 +1,10 @@
 #include "message_node.hh"
 
+#ifdef VISUAL_CPP
+message_node* message_node::hash_table[1023];
+#else
 extern message_node* message_node::hash_table[1023];
+#endif
 
 bool message_node::find(char* msg_text) 
 {

@@ -1,3 +1,7 @@
+#ifdef VISUAL_CPP
+#define snprintf _snprintf
+#endif
+
 #include "method_desc.hh"
 
 void print_call_sequence(callee_desc* callee, int loop_id, int path_id)
