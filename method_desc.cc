@@ -2507,7 +2507,7 @@ void method_desc::parse_code(constant** constant_pool,
 
               if ((!(method->locksAtEntry.owns(curr))) &&
                   (sp[-fp].equals == is_this) && // (method->cls == cls)
-                  (! attr & m_synchronized)
+                  (! (attr & m_synchronized))
                   // synch. methods are already covered by other mechanisms
                   ) {
                 // context at method entry
