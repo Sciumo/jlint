@@ -8,6 +8,8 @@
 #include <stdarg.h>
 class utf_string;
 
+/* The following preprocessor directives are historically grown, if anyone
+   wanted to clean up, I'd be very grateful :) */
 #ifndef __VALIST
 #ifdef va_list
 #define __VALIST va_list
@@ -18,6 +20,14 @@ class utf_string;
 #endif
 // so does OpenBSD
 #ifdef __OpenBSD__
+#define __VALIST va_list
+#endif
+// so does LinuxPPC
+#ifdef __PPC__
+#define __VALIST va_list
+#endif
+// so does MacOSX
+#ifdef __APPLE_CC__
 #define __VALIST va_list
 #endif
 // so does MSVC++

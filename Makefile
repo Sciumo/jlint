@@ -31,7 +31,7 @@ INSTALL_DIR=/usr/local/bin
 
 # Version number
 # VERSION=`grep VERSION jlint.hh | sed 's/.*N //'`
-VERSION=2.2
+VERSION=2.3
 
 # Files that go into distro
 DISTFILES=`ls jlint-$(VERSION)/{antic.c,BUGS,Makefile,*.msg,*.hh,*.cc,*.d,README,TODO,CHANGELOG,COPYING,manual.texi,manual.html,manual.pdf,jlint.sh,mkmf.pl}`
