@@ -35,12 +35,13 @@ FILE* history;
 string_pool stringPool;
 field_desc* is_const;
 
-message_descriptor msg_table[] = {
+message_descriptor msg_table[] = 
+  {
 #define MSG(category, code, position_dependent, format) \
-{cat_##category, MSG_LOCATION_PREFIX##format, #code, position_dependent, true},
+   {cat_##category, MSG_LOCATION_PREFIX format, #code, position_dependent, true},
 #include "jlint.msg"
-  {cat_all}
-};
+    {cat_all}
+  };
 
 unsigned int string_hash_function(byte* p) { 
   unsigned int h = 0, g;

@@ -3,6 +3,8 @@
 #ifndef INLINES_HH
 #define INLINES_HH
 
+#include <assert.h>
+
 inline int unpack2(byte* s) { 
   return (s[0] << 8) + s[1]; 
 }

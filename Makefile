@@ -26,6 +26,7 @@ CPP=g++-3.2
 CFLAGS = -c -Wall -O2 -g
 # -DSLIST removed because it wouldn't compile under gcc 3.x
 # add -DHASH_TABLE for extra speed (may sometimes produce inconsistent results)
+# add -march=i486  if using gcc 3.3, due to a bug in libstdc++
 
 # Optimized version with switched off asserts
 #CFLAGS = -c -Wall -O2 -g -DSLIST -DNDEBUG

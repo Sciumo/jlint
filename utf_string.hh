@@ -3,6 +3,7 @@
 
 #include <string>
 #include <stdio.h>
+#include <assert.h>
 #include "functions.hh"
 #include "types.hh"
 #include "message_node.hh"
