@@ -10,21 +10,21 @@ vbm_operand* ctx_push_var::transfer(method_desc* method, vbm_operand* sp,
   var_desc* var = &method->vars[var_index];
   if (var->type == tp_void) { 
     if (IS_INT_TYPE(var_type)) { 
-	    var->min  = ranges[var_type].min;
-	    var->max  = ranges[var_type].max;
-	    var->mask = var->min|var->max;
+      var->min  = ranges[var_type].min;
+      var->max  = ranges[var_type].max;
+      var->mask = var->min|var->max;
     } else if (var_type == tp_long) { 
-	    var[0].min  = 0x80000000;
-	    var[0].max  = 0x7fffffff;
-	    var[0].mask = 0xffffffff;
-	    var[1].min  = 0;
-	    var[1].max  = 0xffffffff;
-	    var[1].mask = 0xffffffff;	    
+      var[0].min  = 0x80000000;
+      var[0].max  = 0x7fffffff;
+      var[0].mask = 0xffffffff;
+      var[1].min  = 0;
+      var[1].max  = 0xffffffff;
+      var[1].mask = 0xffffffff;	    
     } else { 
-	    var->mask = (var->type == tp_self) 
+      var->mask = (var->type == tp_self) 
         ? var_desc::vs_not_null : var_desc::vs_unknown;
-	    var->min = 0;
-	    var->max = MAX_ARRAY_LENGTH;
+      var->min = 0;
+      var->max = MAX_ARRAY_LENGTH;
     }
   }
   var->type = var_type;
@@ -77,7 +77,7 @@ vbm_operand* ctx_split::transfer(method_desc* method, vbm_operand* sp,
     
   switch (cop) { 
   case jsr:
-  case jsr_w:	
+  case jsr_w:  
     sp->type = tp_object;
     sp->mask = var_desc::vs_not_null;
     sp->min = 0;
@@ -91,65 +91,65 @@ vbm_operand* ctx_split::transfer(method_desc* method, vbm_operand* sp,
     break;
   case ifeq:
     if (vars != NULL && right_op->index >= 0) { 
-	    // state at the branch address
-	    var_desc* var = &vars[right_op->index];
-	    if (prev_cop == iand) { 
+      // state at the branch address
+      var_desc* var = &vars[right_op->index];
+      if (prev_cop == iand) { 
         // Operation of form (x & const) == 0
         if (IS_INT_TYPE(var->type)) { 
           var->mask &= ~right_op->mask;
         }
-	    } else { 
+      } else { 
         var->max = var->min = 0;
         if (IS_INT_TYPE(var->type)) { 
           var->mask = 0;
         }
-	    } 
+      } 
     }
     stack_pointer = right_op;
     break;
   case ifne:
     if (right_op->index >= 0) { // value of local var. was pushed on stack 
-	    // state after if
-	    var_desc* var = &method->vars[right_op->index];
-	    if (prev_cop == iand) { 
+      // state after if
+      var_desc* var = &method->vars[right_op->index];
+      if (prev_cop == iand) { 
         // Operation of form (x & const) != 0
         if (IS_INT_TYPE(var->type)) { 
           var->mask &= ~right_op->mask;
         }
-	    } else { 
+      } else { 
         var->max = var->min = 0;
         if (IS_INT_TYPE(var->type)) { 
           var->mask = 0;
         }
-	    }
+      }
     }
     stack_pointer = right_op;
     break;
   case iflt:
     if (right_op->index >= 0) { 
-	    // state after if
-	    var_desc* var = &method->vars[right_op->index];
-	    if (var->min < 0) var->min = 0;
-	    if (var->max < 0) var->max = 0;
-	    if (IS_INT_TYPE(var->type)) { 
+      // state after if
+      var_desc* var = &method->vars[right_op->index];
+      if (var->min < 0) var->min = 0;
+      if (var->max < 0) var->max = 0;
+      if (IS_INT_TYPE(var->type)) { 
         var->mask &= ~SIGN_BIT;
-	    }
-	    if (vars != NULL) { // forward branch
+      }
+      if (vars != NULL) { // forward branch
         // state at the branch address
         var = &vars[right_op->index];
         if (var->min >= 0) var->min = -1;
         if (var->max >= 0) var->max = -1;
-	    }
+      }
     }
     stack_pointer = right_op;
-    break;	    
+    break;      
   case ifge:
     if (right_op->index >= 0) { 
-	    // state after if
-	    var_desc* var = &method->vars[right_op->index];
-	    if (var->min >= 0) var->min = -1;
-	    if (var->max >= 0) var->max = -1;
-	    if (vars != NULL) { // forward branch
+      // state after if
+      var_desc* var = &method->vars[right_op->index];
+      if (var->min >= 0) var->min = -1;
+      if (var->max >= 0) var->max = -1;
+      if (vars != NULL) { // forward branch
         // state at the branch address
         var = &vars[right_op->index];
         if (var->min < 0) var->min = 0;
@@ -157,17 +157,17 @@ vbm_operand* ctx_split::transfer(method_desc* method, vbm_operand* sp,
         if (IS_INT_TYPE(var->type)) { 
           var->mask &= ~SIGN_BIT;
         }
-	    }
+      }
     }
     stack_pointer = right_op;
-    break;	    
+    break;      
   case ifgt:
     if (right_op->index >= 0) { 
-	    // state after if
-	    var_desc* var = &method->vars[right_op->index];
-	    if (var->min > 0) var->min = 0;
-	    if (var->max > 0) var->max = 0;
-	    if (vars != NULL) { // forward branch
+      // state after if
+      var_desc* var = &method->vars[right_op->index];
+      if (var->min > 0) var->min = 0;
+      if (var->max > 0) var->max = 0;
+      if (vars != NULL) { // forward branch
         // state at the branch address
         var = &vars[right_op->index];
         if (var->min <= 0) var->min = 1;
@@ -175,32 +175,32 @@ vbm_operand* ctx_split::transfer(method_desc* method, vbm_operand* sp,
         if (IS_INT_TYPE(var->type)) { 
           var->mask &= ~SIGN_BIT;
         }
-	    }
+      }
     }
     stack_pointer = right_op;
-    break;	    
+    break;      
   case ifle:
     if (right_op->index >= 0) { 
-	    // state after if
-	    var_desc* var = &method->vars[right_op->index];
-	    if (var->min <= 0) var->min = 1;
-	    if (var->max <= 0) var->max = 1;
-	    if (IS_INT_TYPE(var->type)) { 
+      // state after if
+      var_desc* var = &method->vars[right_op->index];
+      if (var->min <= 0) var->min = 1;
+      if (var->max <= 0) var->max = 1;
+      if (IS_INT_TYPE(var->type)) { 
         var->mask &= ~SIGN_BIT;
-	    }
-	    if (vars != NULL) { // forward branch
+      }
+      if (vars != NULL) { // forward branch
         // state at the branch address
         var = &vars[right_op->index];
         if (var->min > 0) var->min = 0;
         if (var->max > 0) var->max = 0;
-	    }
+      }
     }
     stack_pointer = right_op;
-    break;	    
+    break;      
   case if_icmpeq:
     if (vars != NULL) { 
-	    // state at the branch address
-	    if (right_op->index >= 0) { 
+      // state at the branch address
+      if (right_op->index >= 0) { 
         var_desc* var = &vars[right_op->index];
         if (var->min < left_op->min) var->min = left_op->min;
         if (var->max > left_op->max) var->max = left_op->max;
@@ -208,8 +208,8 @@ vbm_operand* ctx_split::transfer(method_desc* method, vbm_operand* sp,
         if (IS_INT_TYPE(var->type)) { 
           var->mask &= left_op->mask;
         }
-	    }
-	    if (left_op->index >= 0) { 
+      }
+      if (left_op->index >= 0) { 
         var_desc* var = &vars[left_op->index];
         if (var->min < right_op->min) var->min = right_op->min;
         if (var->max > right_op->max) var->max = right_op->max;
@@ -217,41 +217,41 @@ vbm_operand* ctx_split::transfer(method_desc* method, vbm_operand* sp,
         if (IS_INT_TYPE(var->type)) { 
           var->mask &= right_op->mask;
         }
-	    }
+      }
     }
     stack_pointer = left_op;
-    break;	    
+    break;      
   case if_icmpne:
     if (right_op->index >= 0) { 
-	    // state after if
-	    var_desc* var = &method->vars[right_op->index];
-	    if (var->min < left_op->min) var->min = left_op->min;
-	    if (var->max > left_op->max) var->max = left_op->max;
-	    if (var->min > var->max) var->min = var->max; // recovery
-	    if (IS_INT_TYPE(var->type)) { 
+      // state after if
+      var_desc* var = &method->vars[right_op->index];
+      if (var->min < left_op->min) var->min = left_op->min;
+      if (var->max > left_op->max) var->max = left_op->max;
+      if (var->min > var->max) var->min = var->max; // recovery
+      if (IS_INT_TYPE(var->type)) { 
         var->mask &= left_op->mask;
-	    }
+      }
     }
     if (left_op->index >= 0) { 
-	    var_desc* var = &method->vars[left_op->index];
-	    if (var->min < right_op->min) var->min = right_op->min;
-	    if (var->max > right_op->max) var->max = right_op->max;
-	    if (var->min > var->max) var->min = var->max; // recovery
-	    if (IS_INT_TYPE(var->type)) { 
+      var_desc* var = &method->vars[left_op->index];
+      if (var->min < right_op->min) var->min = right_op->min;
+      if (var->max > right_op->max) var->max = right_op->max;
+      if (var->min > var->max) var->min = var->max; // recovery
+      if (IS_INT_TYPE(var->type)) { 
         var->mask &= right_op->mask;
-	    }
+      }
     }
     stack_pointer = left_op;
-    break;	    
+    break;      
   case if_icmplt:
-    if (right_op->index >= 0) { 	
-	    // left >= right
-	    var_desc* var = &method->vars[right_op->index];
-	    if (var->max > left_op->max) { 
+    if (right_op->index >= 0) {   
+      // left >= right
+      var_desc* var = &method->vars[right_op->index];
+      if (var->max > left_op->max) { 
         var->max = left_op->max;
         if (var->min > var->max) var->min = var->max;
-	    }
-	    if (vars != NULL) { 
+      }
+      if (vars != NULL) { 
         // left < right
         var = &vars[right_op->index];
         if (var->min <= left_op->min) { 
@@ -259,16 +259,16 @@ vbm_operand* ctx_split::transfer(method_desc* method, vbm_operand* sp,
             ? left_op->min : left_op->min+1;
           if (var->min > var->max) var->max = var->min;
         }
-	    }
+      }
     }
     if (left_op->index >= 0) { 
-	    // left >= right
-	    var_desc* var = &method->vars[left_op->index];
-	    if (var->min < right_op->min) { 
+      // left >= right
+      var_desc* var = &method->vars[left_op->index];
+      if (var->min < right_op->min) { 
         var->min = right_op->min;
         if (var->min > var->max) var->max = var->min;
-	    }
-	    if (vars != NULL) { 
+      }
+      if (vars != NULL) { 
         // left < right
         var = &vars[left_op->index];
         if (var->max >= right_op->max) { 
@@ -276,56 +276,56 @@ vbm_operand* ctx_split::transfer(method_desc* method, vbm_operand* sp,
             ? right_op->max : right_op->max-1;
           if (var->min > var->max) var->min = var->max;
         }
-	    }
+      }
     }
-    stack_pointer = left_op;	
+    stack_pointer = left_op;  
     break;
   case if_icmple:
-    if (right_op->index >= 0) { 	
-	    // left > right
-	    var_desc* var = &method->vars[right_op->index];
-	    if (var->max >= left_op->max) { 
+    if (right_op->index >= 0) {   
+      // left > right
+      var_desc* var = &method->vars[right_op->index];
+      if (var->max >= left_op->max) { 
         var->max = left_op->max == ranges[tp_int].min
           ? left_op->max : left_op->max-1;
         if (var->min > var->max) var->min = var->max;
-	    }
-	    if (vars != NULL) { 
+      }
+      if (vars != NULL) { 
         // left <= right
         var = &vars[right_op->index];
         if (var->min < left_op->min) { 
           var->min = left_op->min;
           if (var->min > var->max) var->max = var->min;
         }
-	    }
+      }
     }
     if (left_op->index >= 0) { 
-	    // left > right
-	    var_desc* var = &method->vars[left_op->index];
-	    if (var->min <= right_op->min) { 
+      // left > right
+      var_desc* var = &method->vars[left_op->index];
+      if (var->min <= right_op->min) { 
         var->min = right_op->min == ranges[tp_int].max
           ? right_op->min : right_op->min+1;
         if (var->min > var->max) var->max = var->min;
-	    }
-	    if (vars != NULL) { 
+      }
+      if (vars != NULL) { 
         // left <= right
         var = &vars[left_op->index];
         if (var->max > right_op->max) { 
           var->max = right_op->max;
           if (var->min > var->max) var->min = var->max;
         }
-	    }
+      }
     }
-    stack_pointer = left_op;	
+    stack_pointer = left_op;  
     break;
   case if_icmpgt:
-    if (right_op->index >= 0) { 	
-	    // left <= right
-	    var_desc* var = &method->vars[right_op->index];
-	    if (var->min < left_op->min) { 
+    if (right_op->index >= 0) {   
+      // left <= right
+      var_desc* var = &method->vars[right_op->index];
+      if (var->min < left_op->min) { 
         var->min = left_op->min;
         if (var->min > var->max) var->max = var->min;
-	    }
-	    if (vars != NULL) { 
+      }
+      if (vars != NULL) { 
         // left > right
         var = &vars[right_op->index];
         if (var->max >= left_op->max) { 
@@ -333,16 +333,16 @@ vbm_operand* ctx_split::transfer(method_desc* method, vbm_operand* sp,
             ? left_op->max : left_op->max-1;
           if (var->min > var->max) var->min = var->max;
         }
-	    }
+      }
     }
     if (left_op->index >= 0) { 
-	    // left <= right
-	    var_desc* var = &method->vars[left_op->index];
-	    if (var->max > right_op->max) { 
+      // left <= right
+      var_desc* var = &method->vars[left_op->index];
+      if (var->max > right_op->max) { 
         var->max = right_op->max;
         if (var->min > var->max) var->min = var->max;
-	    }
-	    if (vars != NULL) { 
+      }
+      if (vars != NULL) { 
         // left > right
         var = &vars[left_op->index];
         if (var->min <= right_op->min) { 
@@ -350,82 +350,82 @@ vbm_operand* ctx_split::transfer(method_desc* method, vbm_operand* sp,
             ? right_op->min : right_op->min+1;
           if (var->min > var->max) var->max = var->min;
         }
-	    }
+      }
     }
-    stack_pointer = left_op;	
+    stack_pointer = left_op;  
     break;
   case if_icmpge:
-    if (right_op->index >= 0) { 	
-	    // left < right
-	    var_desc* var = &method->vars[right_op->index];
-	    if (var->min <= left_op->min) { 
+    if (right_op->index >= 0) {   
+      // left < right
+      var_desc* var = &method->vars[right_op->index];
+      if (var->min <= left_op->min) { 
         var->min = left_op->min == ranges[tp_int].max
           ? left_op->min : left_op->min+1;
         if (var->min > var->max) var->max = var->min;
-	    }
-	    if (vars != NULL) { 
+      }
+      if (vars != NULL) { 
         // left >= right
         var = &vars[right_op->index];
         if (var->max > left_op->max) { 
           var->max = left_op->max;
           if (var->min > var->max) var->min = var->max;
         }
-	    }
+      }
     }
     if (left_op->index >= 0) { 
-	    // left < right
-	    var_desc* var = &method->vars[left_op->index];
-	    if (var->max >= right_op->max) { 
+      // left < right
+      var_desc* var = &method->vars[left_op->index];
+      if (var->max >= right_op->max) { 
         var->max = right_op->max == ranges[tp_int].min
           ? right_op->max : right_op->max-1;
         if (var->min > var->max) var->min = var->max;
-	    }
-	    if (vars != NULL) { 
+      }
+      if (vars != NULL) { 
         // left >= right
         var = &vars[left_op->index];
         if (var->min < right_op->min) { 
           var->min = right_op->min;
           if (var->min > var->max) var->max = var->min;
         }
-	    }
+      }
     }
-    stack_pointer = left_op;	
+    stack_pointer = left_op;  
     break;
   case if_acmpeq:
     if (vars != NULL) { 
-	    if (right_op->index >= 0) { 
+      if (right_op->index >= 0) { 
         vars[right_op->index].mask &= left_op->mask;
-	    } 
-	    if (left_op->index >= 0) { 
+      } 
+      if (left_op->index >= 0) { 
         vars[left_op->index].mask &= right_op->mask;
-	    } 
+      } 
     }
     stack_pointer = left_op;
     break;
   case if_acmpne:
     if (right_op->index >= 0) { 
-	    method->vars[right_op->index].mask &= left_op->mask;
+      method->vars[right_op->index].mask &= left_op->mask;
     } 
     if (left_op->index >= 0) { 
-	    method->vars[left_op->index].mask &= right_op->mask;
+      method->vars[left_op->index].mask &= right_op->mask;
     } 
     stack_pointer = left_op;
     break;
   case ifnull:
     if (right_op->index >= 0) { 
-	    method->vars[right_op->index].mask |= var_desc::vs_not_null;
-	    if (vars != NULL) { 
+      method->vars[right_op->index].mask |= var_desc::vs_not_null;
+      if (vars != NULL) { 
         vars[right_op->index].mask &= ~var_desc::vs_not_null;
-	    }
+      }
     }
     stack_pointer = right_op;
     break;
   case ifnonnull:
     if (right_op->index >= 0) { 
-	    method->vars[right_op->index].mask &= ~var_desc::vs_not_null;
-	    if (vars != NULL) { 
+      method->vars[right_op->index].mask &= ~var_desc::vs_not_null;
+      if (vars != NULL) { 
         vars[right_op->index].mask |= var_desc::vs_not_null;
-	    }
+      }
     }
     stack_pointer = right_op;
     break;
@@ -550,7 +550,7 @@ vbm_operand* ctx_merge::transfer(method_desc* method, vbm_operand* sp,
           STORE_INT8(sp-2, max, max1); 
         }
         mask0 |= mask1;
-        STORE_INT8(sp-2, mask, mask0);	    
+        STORE_INT8(sp-2, mask, mask0);      
 #endif
       } else { 
         if (sp[-1].min > come_from->stack_top[1].min) { 
@@ -587,23 +587,23 @@ vbm_operand* ctx_entry_point::transfer(method_desc* method, vbm_operand* sp,
   for (int i = method->n_vars; --i >= 0; var++) { 
     int type = var->type;
     if (IS_INT_TYPE(type)) { 
-	    var->min  = ranges[type].min;
-	    var->max  = ranges[type].max;
-	    var->mask = var->min | var->max;
+      var->min  = ranges[type].min;
+      var->max  = ranges[type].max;
+      var->mask = var->min | var->max;
     } else if (type == tp_long) { 
-	    var->min  = 0x80000000;
-	    var->max  = 0x7fffffff;
-	    var->mask = 0xffffffff;
-	    var += 1;
-	    var->min  = 0x00000000;
-	    var->max  = 0xffffffff;
-	    var->mask = 0xffffffff;
-	    i -= 1;
-	    assert(i >= 0);
+      var->min  = 0x80000000;
+      var->max  = 0x7fffffff;
+      var->mask = 0xffffffff;
+      var += 1;
+      var->min  = 0x00000000;
+      var->max  = 0xffffffff;
+      var->mask = 0xffffffff;
+      i -= 1;
+      assert(i >= 0);
     } else { 
-	    var->min  = 0;
-	    var->max  = MAX_ARRAY_LENGTH;
-	    var->mask = var_desc::vs_unknown;
+      var->min  = 0;
+      var->max  = MAX_ARRAY_LENGTH;
+      var->mask = var_desc::vs_unknown;
     }
   }
 #endif
@@ -625,12 +625,12 @@ vbm_operand* ctx_reset::transfer(method_desc* method, vbm_operand* sp,
     // code between backward jump label and backward jump intruction
     //
     if (method->var_store_count[i] != var_store_count[i]) { 
-	    int type = var->type;
-	    if (IS_INT_TYPE(type)) { 
+      int type = var->type;
+      if (IS_INT_TYPE(type)) { 
         var->min  = ranges[type].min;
         var->max  = ranges[type].max;
         var->mask = var->min | var->max;
-	    } else if (type == tp_long) { 
+      } else if (type == tp_long) { 
         var->min  = 0x80000000;
         var->max  = 0x7fffffff;
         var->mask = 0xffffffff;
@@ -640,11 +640,11 @@ vbm_operand* ctx_reset::transfer(method_desc* method, vbm_operand* sp,
         var->mask = 0xffffffff;
         i += 1;
         assert(i < n);
-	    } else { 
+      } else { 
         var->mask = var_desc::vs_unknown;
         var->min  = 0;
         var->max  = MAX_ARRAY_LENGTH;
-	    }
+      }
     }
   }
   delete[] var_store_count;
