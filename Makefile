@@ -51,6 +51,7 @@ install:
 	cp jlint antic jlint.sh $(INSTALL_DIR)
 	chmod 755 $(INSTALL_DIR)/antic
 	chmod 755 $(INSTALL_DIR)/jlint
+	chmod 755 $(INSTALL_DIR)/jlint.sh
 
 
 # --> automatically generated dependencies follow; do not remove this line.
