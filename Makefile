@@ -32,7 +32,8 @@ CFLAGS = -c -Wall -O2 -g
 # Optimized version with switched off asserts
 #CFLAGS = -c -Wall -O2 -g -DSLIST -DNDEBUG
 
-LFLAGS=-g
+# link zlib the compression/decompression library. used for decompressing jar files
+LFLAGS=-g -lz
 
 # Directory to place executables
 INSTALL_DIR=/usr/local/bin
@@ -60,8 +61,8 @@ antic: antic.o
 
 clean: 
 	rm -f  *.o *.exe core *~ *.his *.class jlint antic manual.{html,pdf,aux,cp,fn,ky,log,pg,toc,tp,vr}
-	if [ -d ./tests/log ]; then rm -f ./tests/log/*.{err,errfiles,log}; rm -f ./tests/log/test.{diff,err}; fi
-	if [ -d ./tests ]; then rm -f tests.tar.bz2; fi
+	if [ -d ./tests/log ]; then rm -f ./tests/log/*~ ./tests/log/*.{err,errfiles,log}; rm -f ./tests/log/test.{diff,err}; fi
+	if [ -d ./tests ]; then rm -f ./tests/*~ tests.tar.bz2; fi
 
 doc:  manual.texi
 	texi2html -monolithic manual.texi; texi2pdf manual.texi

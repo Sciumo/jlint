@@ -23,6 +23,12 @@
 
 #include "jlint.hh"
 
+extern "C"
+{
+  //#include <zlib.h>        // should I use <zlib.h> or "zlib.h" ??
+   #include "zlib.h"
+};
+
 bool   verbose = false;
 int   max_shown_paths = 4;
 
@@ -750,6 +756,8 @@ void proceed_file(char* file_name, bool recursive = false)
     byte* dp = directory;
 
     while (--count >= 0) {
+      int compression_method = unpack2_le(&dp[4+C_COMPRESSION_METHOD]);
+      int compressed_size = unpack4_le(&dp[4+C_COMPRESSED_SIZE]);
       int uncompressed_size = unpack4_le(&dp[4+C_UNCOMPRESSED_SIZE]);
       int filename_length = unpack2_le(&dp[4+C_FILENAME_LENGTH]);
       int cextra_length = unpack2_le(&dp[4+C_EXTRA_FIELD_LENGTH]);
@@ -777,25 +785,88 @@ void proceed_file(char* file_name, bool recursive = false)
 
       int filename_offset = CREC_SIZE+4;
 
-      if (uncompressed_size != 0) { 
-        byte* buffer = new byte[uncompressed_size];
-        if (fseek(f, file_start, SEEK_SET) != 0 
-            || fread(buffer, uncompressed_size, 1, f) != 1) 
-          { 
-            fprintf(stderr, "Failed to read ZIP file '%s'\n", 
-                    file_name);
-            return;
-          } else { 
-            if (verbose) { 
-              fprintf(stderr, "Verify file '%.*s'\n", 
-                      filename_length, dp + filename_offset); 
-            }
-            if (!parse_class_file(buffer)) { 
-              fprintf(stderr, "File '%.*s' isn't correct Java class "
-                      "file\n", filename_length, dp+filename_offset);
-            }
+      // value unknown. have to ask Mark Wutka
+      //      if (compression_method C_UNCOMPRESSED)
+      if (compression_method != C_DEFLATE)
+	{
+          if (uncompressed_size != 0) { 
+            byte* buffer = new byte[uncompressed_size];
+            if (fseek(f, file_start, SEEK_SET) != 0 
+                || fread(buffer, uncompressed_size, 1, f) != 1) 
+              { 
+                fprintf(stderr, "Failed to read ZIP file '%s'\n", 
+                        file_name);
+                return;
+              } else { 
+                if (verbose) { 
+                  fprintf(stderr, "Verify file '%.*s'\n", 
+                          filename_length, dp + filename_offset); 
+                }
+                if (!parse_class_file(buffer)) { 
+                  fprintf(stderr, "File '%.*s' isn't correct Java class "
+                          "file\n", filename_length, dp+filename_offset);
+                }
+              }
+            delete[] buffer;
           }
-        delete[] buffer;
+      }
+      else if (compression_method == C_DEFLATE) {
+
+          if ((uncompressed_size != 0) && (compressed_size != 0)) { 
+            byte* uncbuffer = new byte[uncompressed_size];
+            byte* cbuffer = new byte[compressed_size];
+            if (fseek(f, file_start, SEEK_SET) != 0 
+                || fread(cbuffer, compressed_size, 1, f) != 1) 
+              { 
+                fprintf(stderr, "Failed to read ZIP file '%s'\n", 
+                        file_name);
+                return;
+              } else { 
+                z_stream c_stream;
+
+                c_stream.zalloc = (alloc_func) 0;
+                c_stream.zfree = (free_func)0;
+                c_stream.opaque = (voidpf)0;
+
+                int err = inflateInit2(&c_stream, -MAX_WBITS);
+                if (err != Z_OK)
+                {
+                    fprintf(stderr, "Error %s in inflateInit while uncompressing %.*s.\n",
+                        c_stream.msg, filename_length, dp+filename_offset);
+                }
+                else
+                {
+                    c_stream.next_in = cbuffer;
+                    c_stream.next_out = uncbuffer;
+                    c_stream.avail_in = compressed_size;
+                    c_stream.avail_out = uncompressed_size;
+                    c_stream.total_in = 0;
+                    c_stream.total_out = 0;
+
+                    while ((err=inflate(&c_stream, Z_SYNC_FLUSH)) == Z_OK);
+                    if ((err != Z_STREAM_END) && (err != Z_OK))
+                    {
+                        fprintf(stderr, "Error %s in inflate while uncompressing %.*s.\n",
+                            c_stream.msg, filename_length, dp+filename_offset);
+                    }
+                    else
+                    {
+                        inflateEnd(&c_stream);
+
+                        if (verbose) { 
+                            fprintf(stderr, "Verify file '%.*s'\n", 
+                            filename_length, dp + filename_offset); 
+                        }
+                        if (!parse_class_file(uncbuffer)) { 
+                            fprintf(stderr, "File '%.*s' isn't correct Java class "
+                                "file\n", filename_length, dp+filename_offset);
+                        }
+                    }
+                }
+              }
+            delete[] cbuffer;
+            delete[] uncbuffer;
+          }
       }
       dp += filename_offset + filename_length + cextra_length; 
     }
