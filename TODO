@@ -1,0 +1,29 @@
+
+
+ To do
+
+* (2) Context merging (return, exceptions, if, while, for)
+  will eliminate some spurious warnings.
+
+* (2) Variables and methods that are read-only:
+
+  * Variable is not accessed outside constructor or synchronized(this)
+    block.
+
+  * Method does not access fields that are not read only
+    (according to the definition above).
+
+* (2) Non-synchronized method where object instance is not
+  visible outside current thread (e. g. local variable)
+  can be called. Requires evaluating accessor information.
+
+* (2) Improve verbosity/information content of some (existing)
+  warnings.
+
+* (3) Support for getClass() in synchronization.
+
+* (3) Eliminate spurious warnings where implicit synchronization
+  exists (e. g. streams)
+
+* (3) Documentation: better tagging of text (e. g. @var),
+  full @node tree for document
