@@ -2542,10 +2542,12 @@ void method_desc::parse_code(class_desc* this_class,
           in_monitor -= 1;
         }
         sp -= 1;
-        monitor_table::iterator entry = 
-          this_class->monitors.find(sp->equals->name.as_asciz());
-        if (entry != this_class->monitors.end()) {
-          this_class->monitors.erase(entry);
+        if (sp->equals != NULL) {
+          monitor_table::iterator entry = 
+            this_class->monitors.find(sp->equals->name.as_asciz());
+          if (entry != this_class->monitors.end()) {
+            this_class->monitors.erase(entry);
+          }
         }
       }
 	    break;
