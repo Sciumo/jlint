@@ -7,6 +7,7 @@ class access_desc;
 class callee_desc;
 
 #include <string>
+#include <vector>
 #include "types.hh"
 #include "inlines.hh"
 #include "component_desc.hh"
@@ -126,6 +127,11 @@ public:
       local_variable_table_present = false;
       null_parameter_mask = unchecked_use_mask = 0;
     }
+
+private:
+  typedef vector<field_desc*> Tequal_descs; // field_descs for "equal" field
+  Tequal_descs equal_descs; // field_descs for "equal" field
+  field_desc* getNew(); // returns new field desc* and increments counter
 };
 
 
