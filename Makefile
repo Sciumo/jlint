@@ -11,7 +11,7 @@ CPP=g++
 
 # Debug version
 #CFLAGS = -c -Wall -O0 -g -DSLIST -DHASH_TABLE -DDEBUG
-#CFLAGS = -c -Wall -O0 -g -DSLIST -DDUMP_MONITOR -DDUMP_EDGES -DDUMP_STACK -DDUMP_BYTE_CODES
+#CFLAGS = -c -Wall -O0 -g -DSLIST -DDUMP_EDGES -DDEBUG -DDUMP_MONITOR
 #CFLAGS = -c -Wall -O0 -g -DSLIST -DHASH_TABLE -DDUMP_EDGES -DDUMP_BYTE_CODES -DPRINT_PC -DDUMP_STACK -DDUMP_MONITOR -DDEBUG
 
 # Optimized version
@@ -38,7 +38,7 @@ clean:
 	rm -f  *.o *.exe core *~ *.his *.class jlint antic
 
 targz: clean
-	cd ..; tar cvzf jlint.tar.gz jlint
+	cd ..; tar -cvzf jlint.tar.gz jlint/antic.c jlint/BUGS jlint/Makefile jlint/*.msg jlint/*.hh jlint/*.cc jlint/*.d; cd jlint
 
 install:	
 	cp jlint antic $(INSTALL_DIR)
