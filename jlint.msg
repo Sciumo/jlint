@@ -24,6 +24,8 @@ MSG(race_condition,nosync,0,"Synchronized method %2m is overridden by non-synchr
 MSG(race_condition,concurrent_call,0,"Method %2m can be called from different threads and is not synchronized")
 MSG(race_condition,concurrent_access,0,"Field '%2u' of class '%3c' can be accessed from different threads and is not volatile")
 MSG(race_condition,run_nosync,0,"Method %2m implementing 'Runnable' interface is not synchronized")
+MSG(race_condition,lock_assign,0,"Value of lock %2u is changed outside synchronization or constructor")
+MSG(race_condition,lock_assign2,0,"Value of lock %2u is changed while (potentially) owning it")
 // MSG(wait_nosync,wait_nosync,0,"Method %2u is called from non-synchronized method")
 MSG(wait_nosync,wait_nosync,0,"Method '%2s.%3u' is called without synchronizing on '%2s'")
 
@@ -31,8 +33,8 @@ MSG(wait_nosync,wait_nosync,0,"Method '%2s.%3u' is called without synchronizing 
 // Inheritance
 //
 MSG(not_overridden,not_overridden,0,"Method %2m is not overridden by method with the same name of derived class '%3c'")
-MSG(not_overridden,equals_not_overridden,0,"hashCode() was overriden but not equals()")
-MSG(not_overridden,hashcode_not_overridden,0,"equals() was overriden but not hashCode()")
+MSG(not_overridden,equals_not_overridden,0,"hashCode() was overridden but not equals()")
+MSG(not_overridden,hashcode_not_overridden,0,"equals() was overridden but not hashCode()")
 MSG(field_redefined,field_redefined,0,"Component '%2u' in class '%3c' shadows one in base class '%4c'")
 MSG(shadow_local,shadow_local,1,"Local variable '%2u' shadows component of class '%3c'")
 MSG(super_finalize,super_finalize,0,"Method finalize() doesn't call super.finalize()")

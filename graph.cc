@@ -20,7 +20,11 @@ void graph_edge::message(int loop_id)
                           (*entry)->name.as_asciz());
           if (strcmp(full_name, lock1)) {
             lockset += string(", ");
-            lockset += full_name;
+            if (strcmp(full_name, "")) {
+              lockset += full_name;
+            } else {
+              lockset += "<unknown>";
+            }
           }
           entry++;
         }
@@ -29,6 +33,9 @@ void graph_edge::message(int loop_id)
           lockset.replace(0, 2, "set {");
         } else {
           lockset.replace(0, 2, "");
+        }
+        if (lockset == "") {
+          lockset = "<unknown>";
         }
         invocation->message(msg_lock, lock1, lockset.c_str());
       } else {

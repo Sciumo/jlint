@@ -2336,6 +2336,32 @@ void method_desc::parse_code(constant** constant_pool,
 
         if (cls->name == *cls_name) { 
           field->attr |= field_desc::f_used;
+          if ((name != "<init>") && (name != "<clinit>") &&
+              (! (cls->locks.owns(is_this)))) {
+            // allow assignments to lock only inside monitor or constructor
+
+            // should also check whether monitor field is owned (if so, error)
+            if ((cls->locks.owns(field)) ||
+                (locksAtEntry.owns(field))) {
+              if (strchr(field->name.as_asciz(), '$') == NULL) {
+                // don't print warning for variable names with $
+                // because javac sometimes does weird stuff for class locks
+                message_at(msg_lock_assign2, cls->source_file,
+                         get_line_number(addr), field);
+              }
+            } else {
+              if (strchr(field->name.as_asciz(), '$') == NULL) {
+                // don't print warning for variable names with $
+                // because javac sometimes does weird stuff for class locks
+                int linenumber = get_line_number(addr);
+                field->write(linenumber);
+                if (field->equals) {
+                  const_cast<field_desc *>(field->equals)->write(linenumber);
+                  // mark field as written to (const_cast req'd here)
+                }
+              }
+            }
+          }
         }
         if (!in_monitor) { 
           accessors = new access_desc(field, cls, 
@@ -2349,7 +2375,7 @@ void method_desc::parse_code(constant** constant_pool,
             /*field_desc* aux = new field_desc(*(sp->equals));
             aux->name_and_type = nt;
             sp->equals = aux;
-            equal_descs.insert(equal_descs.begin(), aux);*/
+            equal_descs.push_back(aux);*/
             sp->equals = is_const;
           }
         }
@@ -2480,7 +2506,7 @@ void method_desc::parse_code(constant** constant_pool,
 
           if ((cls->locks.nLocks() > 0)
               && (method->name != "<init>")
-              && (method->name != "<cinit>")
+              && (method->name != "<clinit>")
               ) {
             // if locks are currently held...
             // ... add call from innermost "pseudo method" to method
@@ -2660,6 +2686,10 @@ void method_desc::parse_code(constant** constant_pool,
           // mark monitor ownership; use monitor count in later version
           Lock curr = cls->locks.getInnermost();
           cls->locks.acquire(sp->equals);
+          cls->usedLocks.acquire(sp->equals);
+          if (sp->equals == is_this) {
+            attr |= m_synchronized; // mark method as "synchronized"
+          }
           if (sp->equals->name_and_type != NULL) {
             class_desc* curr_cls;
             const class_desc* curr_type;
@@ -2673,24 +2703,30 @@ void method_desc::parse_code(constant** constant_pool,
               // this will allow us to distinguish between instances (imperfectly)
               /* utf_string* curr_class_type = 
                  dynamic_cast<utf_string*>(constant_pool[curr->name_and_type->desc]); */
-              if (curr->name_and_type->name == 0) {
-                curr_cls = cls;
+              // if method is synchronized, use method as caller - otherwise,
+              // use pseudo method OWNER.var_name.<synch>
+              if (curr == is_this) {
+                curr_type = curr_cls = cls;
+                caller_method = this;
               } else {
-                curr_cls = curr->cls;
-              }
-              curr_type = curr_cls;
-              // use pseudo class name "owner.name" to distinguish between
-              // fields of different objects
-              curr_class_name = curr_cls->name.as_asciz();
-              const char* curr_name =
-                compound_name(curr_class_name, curr->name.as_asciz());
-              curr_cls = class_desc::get(utf_string(curr_name));
+                if (curr->name_and_type->name == 0) {
+                  curr_cls = cls;
+                } else {
+                  curr_cls = curr->cls;
+                }
+                curr_type = curr_cls;
+                // use pseudo class name "owner.name" to distinguish between
+                // fields of different objects
+                curr_class_name = curr_cls->name.as_asciz();
+                const char* curr_name =
+                  compound_name(curr_class_name, curr->name.as_asciz());
+                curr_cls = class_desc::get(utf_string(curr_name));
               
-              caller_method =
-                curr_cls->get_method(utf_string("<synch>"), utf_string("()"));
-              // caller_method->attr |= method_desc::m_synchronized;
-              // disable?
-
+                caller_method =
+                  curr_cls->get_method(utf_string("<synch>"), utf_string("()"));
+                // caller_method->attr |= method_desc::m_synchronized;
+                // disable?
+              }
             } else { // no lock acquired yet in this method
               // add call graph edge (this method) -> (lock)
               // get method descriptor of this method
@@ -3007,7 +3043,7 @@ field_desc* method_desc::getNew() {
   const char* fd_name = stringPool.add(name);
   free(name);
   field_desc* fd = new field_desc(utf_string(fd_name), cls, NULL);
-  // equal_descs.insert(equal_descs.begin(), fd);
+  // equal_descs.push_back(fd);
   return fd;
 }
 

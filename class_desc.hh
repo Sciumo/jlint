@@ -12,6 +12,7 @@
 class class_desc { 
 public:
   Locks locks; // locks held by current thread
+  Locks usedLocks; // locks (other than "this") ever used by current class
 
   utf_string     name;
   utf_string     source_file;

@@ -88,7 +88,7 @@ public:
   }
 
   Lock getInnermost() { // get most recently acquired lock
-    if (monStack.size() > 0) {
+    if (!(monStack.empty())) {
       return monStack.front();
     } else {
       return NULL;

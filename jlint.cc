@@ -587,6 +587,18 @@ bool parse_class_file(byte* fp)
   //delete is_this;
   delete is_const;
 
+  monitor_stack::const_iterator it;
+  for (it = this_class->usedLocks.begin();
+       it != this_class->usedLocks.end(); it++) {
+    if (!((*it)->writes.empty())) {
+      vector<int>::const_iterator i;
+      for (i = (*it)->writes.begin(); i != (*it)->writes.end(); i++) {
+        message_at(msg_lock_assign, this_class->source_file, *i, *it);
+        // *i: line number; *it = field_desc*
+      }
+    }
+  }
+  
   return true;
 }
 
