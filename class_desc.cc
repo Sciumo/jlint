@@ -97,35 +97,51 @@ void class_desc::check_inheritance(class_desc* derived)
     if (bm->is_special_method() || (bm->attr & method_desc::m_static)) { 
       continue;
     }
+    for (method_desc* dm=derived->methods; dm != NULL; dm=dm->next) {
+      if ( (bm->name == dm->name) && (bm->desc == dm->desc)) { 
+        if (!(dm->attr & method_desc::m_override)) { 
+          bm->overridden = 
+            new overridden_method(dm, bm->overridden);
+          if ((bm->attr & method_desc::m_synchronized) &&
+              !(dm->attr & method_desc::m_synchronized))
+          {
+            message_at(msg_nosync, derived->source_file, 
+                       dm->first_line, bm, derived);
+          }
+          if (!(attr & cl_interface)) { 
+            dm->attr |= method_desc::m_override;
+          }
+        }
+        break;
+      }
+    }
+  }
+
+  /* find possible override mistakes */
+  for (method_desc* bm = methods; bm != NULL; bm = bm->next) { 
+    if (bm->is_special_method() || (bm->attr & method_desc::m_static)) { 
+      continue;
+    }
     bool overridden = false;
     method_desc* match = NULL;
     for (method_desc* dm=derived->methods; dm != NULL; dm=dm->next) {
       if (bm->name == dm->name) { 
-        match = dm;
-        if (bm->desc == dm->desc) { 
+
+        if (!(dm->attr & method_desc::m_override))
+          match = dm;
+
+        if (bm->desc == dm->desc) {
           overridden = true;
-          if (!(dm->attr & method_desc::m_override)) { 
-            bm->overridden = 
-              new overridden_method(dm, bm->overridden);
-            if ((bm->attr & method_desc::m_synchronized) &&
-                !(dm->attr & method_desc::m_synchronized))
-              {
-                message_at(msg_nosync, derived->source_file, 
-                           dm->first_line, bm, derived);
-              }
-            if (!(attr & cl_interface)) { 
-              dm->attr |= method_desc::m_override;
-            }
-          }
           break;
         }
-      }    
+      }
     }
     if (match != NULL && !overridden) { 
       message_at(msg_not_overridden, derived->source_file, 
                  match->first_line, bm, derived);
     }
   }
+  
   for (int n = 0; n < n_bases; n++) { 
     bases[n]->check_inheritance(derived);
   }
@@ -220,7 +236,7 @@ void class_desc::global_analysis()
   }
     
   //
-  // Check non-synchronized access to variables by concurrent methods
+  // Check non-synchrnized access to variables by concurrent methods
   // (race condition) and detect unchecked accessed to formal parameters
   // of method which can be passed "null" value in some invocation of 
   // this method
@@ -230,7 +246,7 @@ void class_desc::global_analysis()
   }
     
   //
-  // Explore class dependency graph to detect possible sources of 
+  // Explore class dependency grpah to detect possible sources of 
   // deadlocks
   //
   graph_vertex::verify();

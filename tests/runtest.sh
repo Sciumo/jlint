@@ -19,7 +19,7 @@ do
     if [ -d $DIR/test$I ]
     then
 	find $DIR/test$I/ -name '*.class' | \
-	sed -e 's,\$,\\$,g' | sort -d | sed -e "s,\(.*\), jlint \1 >>$LOGDIR/$I.log 2>>$LOGDIR/$I.err," | sh 2>>$LOGDIR/$I.errfiles
+	sed -e 's,\$,\\$,g' | sort -d | sed -e "s,\(.*\), ../jlint \1 >>$LOGDIR/$I.log 2>>$LOGDIR/$I.err," | sh 2>>$LOGDIR/$I.errfiles
 	# sort -d so that jlint will analyze the class files always in the 
 	# same order. 
 	# output of jlint will be written in $I.log

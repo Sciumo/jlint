@@ -16,7 +16,9 @@ port by Maarten Breddels; compatibility patch for older compilers by
 Eric A. Raymond; OpenBSD patch by Kevin Lo. LinuxPPC and MacOS X port
 (both trivial) by Cyrille Artho.
 
-Version 3.0: works with java 1.4, added test framework by Raphael Ackermann
+Version 3.0: works with java 1.4, added test framework by Raphael 
+Ackermann; Support for compressed zip/jar files by Mark Wutka; Patch for 
+class_desc.cc by Jeroen Mostert
 
 Usage:
 ------
