@@ -2,6 +2,13 @@
 
  To do
 
+* (1) Restructuring/rewriting of the data structures. Some
+  classes are poorly designed, and in general the given
+  framework is inadequate for more powerful analysis (such
+  as the analysis of lock sets when calls from one class
+  to another class are made).
+  See thesis report for details.
+
 * (2) Context merging (return, exceptions, if, while, for)
   will eliminate some spurious warnings.
 
@@ -12,6 +19,9 @@
 
   * Method does not access fields that are not read only
     (according to the definition above).
+
+* (2) Full analysis of lock sets across method/class boundaries
+  for wait/notify calls.
 
 * (2) Non-synchronized method where object instance is not
   visible outside current thread (e. g. local variable)

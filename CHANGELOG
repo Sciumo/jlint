@@ -1,0 +1,8 @@
+Jlint changelog:
+Version 1.11: Last version from Konstantin Knizhnik, using one source and one header file.
+Version 2.0: As a part of Cyrille Artho's master thesis, 2 1/2 weeks were spent on cleaning up and extending Jlint as follows:
+	- Jlint has been restructured into several files. All larger classes now are in their own file, while some smaller classes have been grouped by their meaning. This makes Jlint easier to maintain.
+	- Synchronized blocks are now fully supported. The value of references is tracked during their "life" on the stack and as static or instance variables. This allowed the following improvements:
+		1. wait/notify[All] calls are now truly checked: The current set of locks is analyzed. Depending on whether a thread holds the lock it is wait()ing on or whether it holds other locks, too, different (much more precise) warnings are issued.
+		2. Inter-method deadlocks from synchronized blocks are fully checked. The call graph analysis has been extended with "pseudo method calls" whenever a lock is being obtained. This extends the old analysis for synchronized methods.
+		3. Assignments to locking variables (usually hazardous) are also checked. If they are not within a constructor or guarded by a lock, a warning is issued.
