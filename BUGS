@@ -3,6 +3,8 @@ Known bugs in Jlint
 
 Priority (1 = highest)	Bug
 
+1	Code is not 64 bit clean (see TODO).
+
 1	Control flow (if/while/for/exceptions) does not work (in
 method_desc::basic_blocks_analysis). Conditionals and jumps (in Bytecode)
 seem to be ignored. local_context classes are undocumented and therefore

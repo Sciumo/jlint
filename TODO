@@ -1,6 +1,11 @@
+To do
+=====
 
-
- To do
+* (1) Make code 64 bit clean by adding more type casts. E.g.
+  void *p;
+  int i;
+  p = (void *) (ptrword) i;
+  where ptrword is derived from a ./configure script.
 
 * (1) Restructuring/rewriting of the data structures: Some
   classes are poorly designed, and in general the given
