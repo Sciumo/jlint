@@ -13,6 +13,7 @@
 
 #define VERSION 2.3
 
+
 #include "types.hh"
 #include "message_node.hh"
 #include "utf_string.hh"
