@@ -112,7 +112,7 @@ public:
 
   void basic_blocks_analysis();
 
-  void parse_code(class_desc* cls, constant** constant_pool);
+  void parse_code(constant** constant_pool);
 
   method_desc(utf_string const& mth_name, utf_string const& mth_desc, 
               class_desc* cls_desc, method_desc* chain) 

@@ -548,7 +548,7 @@ bool parse_class_file(byte* fp)
 #ifdef DEBUG
         printf("Method %s\n", mth_name->as_asciz());
 #endif
-        method->parse_code(this_class, constant_pool);
+        method->parse_code(constant_pool);
       } else { 
         fp += attr_len;
       }

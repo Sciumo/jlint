@@ -608,8 +608,7 @@ void method_desc::basic_blocks_analysis()
   }
 }
 
-void method_desc::parse_code(class_desc* this_class, 
-                             constant** constant_pool)
+void method_desc::parse_code(constant** constant_pool)
 {
   const int indirect = 0x100;
   byte* pc = code;
@@ -680,7 +679,7 @@ void method_desc::parse_code(class_desc* this_class,
     for (ctx = context[addr]; ctx != NULL; ctx = ctx->next) {
       sp = ctx->transfer(this, sp, cop, prev_cop);
     }
-    switch (cop) { 
+    switch (cop) {
     case nop:
       break;
     case aconst_null:
@@ -2395,7 +2394,7 @@ void method_desc::parse_code(class_desc* this_class,
               || mth_name == "notify_all" 
               || mth_name == "wait") { 
             if (attr & m_synchronized) { // add "this" to lock set if needed
-              this_class->monitors.insert(monitor_table::value_type("<this>", 1));              
+              cls->monitors.insert(monitor_table::value_type("<this>", 1));              
               if (wait_on == "<this>") {
                 hold_lock = true;
               }
@@ -2405,8 +2404,8 @@ void method_desc::parse_code(class_desc* this_class,
               // check whether lock on object which is waited on is owned
               if (wait_on != NULL) {
                 monitor_table::const_iterator entry = 
-                  this_class->monitors.find(wait_on);
-                if (entry != this_class->monitors.end()) {
+                  cls->monitors.find(wait_on);
+                if (entry != cls->monitors.end()) {
                   hold_lock = true;
                 }
               }
@@ -2419,14 +2418,14 @@ void method_desc::parse_code(class_desc* this_class,
             wait_line = get_line_number(addr);
             attr |= m_wait;
             // check whether other locks are held
-            if (this_class->monitors.size() - (hold_lock? 1:0) > 0) {
+            if (cls->monitors.size() - (hold_lock? 1:0) > 0) {
               message(msg_wait, addr);
               if (verbose) { // print all other montors
                 char buf[100]; // buffer for locks
                 char* out = buf;
                 int n;
-                monitor_table::const_iterator entry = this_class->monitors.begin();
-                while (entry != this_class->monitors.end()) {
+                monitor_table::const_iterator entry = cls->monitors.begin();
+                while (entry != cls->monitors.end()) {
                   if ((n = snprintf(out, sizeof(buf)-(out-buf), 
                                     " %s,", entry->first)) == -1) {
                     // no space in buffer left - print "..." at end of buffer
@@ -2438,7 +2437,7 @@ void method_desc::parse_code(class_desc* this_class,
                   entry++;
                 }
                 *(out-1) = '\0';
-                message(msg_locklist, addr, this_class->monitors.size(), buf);
+                message(msg_locklist, addr, cls->monitors.size(), buf);
                 n_messages--; // avoid counting message twice
               }
             }
@@ -2575,11 +2574,11 @@ void method_desc::parse_code(class_desc* this_class,
         in_monitor += 1;
         sp -= 1;
         if (sp->equals != NULL) {
-          this_class->monitors.insert(monitor_table::value_type(sp->equals->name.as_asciz(), 1));
+          cls->monitors.insert(monitor_table::value_type(sp->equals->name.as_asciz(), 1));
           // mark monitor ownership; use monitor count in later version
 #ifdef DUMP_MONITOR
           printf("%s acquires lock on %s\n", 
-                 this_class->name.as_asciz(),
+                 cls->name.as_asciz(),
                  sp->equals->name.as_asciz()
                  );
 #endif  
@@ -2594,13 +2593,13 @@ void method_desc::parse_code(class_desc* this_class,
         sp -= 1;
         if (sp->equals != NULL) {
           monitor_table::iterator entry = 
-            this_class->monitors.find(sp->equals->name.as_asciz());
-          if (entry != this_class->monitors.end()) {
-            this_class->monitors.erase(entry);
+            cls->monitors.find(sp->equals->name.as_asciz());
+          if (entry != cls->monitors.end()) {
+            cls->monitors.erase(entry);
           }
 #ifdef DUMP_MONITOR
           printf("%s relinquishes lock on %s\n", 
-                 this_class->name.as_asciz(),
+                 cls->name.as_asciz(),
                  sp->equals->name.as_asciz()
                  );
 #endif  
