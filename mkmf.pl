@@ -1,12 +1,13 @@
 #!/usr/bin/perl
 ###############################################################################
 # mkmf.pl
-# Makefile generator v0.2 written by Cyrille Artho
+# Makefile generator v0.5 written by Cyrille Artho
 # changes:
 # 0.1: initial version.
 # 0.2: better output (each file on one line with \ at the end) and update mode
 # 0.3: removed stupid bug that produces broken Makefiles
 # 0.4: removed another stupid bug that omitted the .c files in dependencies...
+# 0.5: removed unused @hfiles list
 ###############################################################################
 # generates a simple default Makefile
 # a) takes Makefile.top and (optionally) Makefile.bottom and generates
@@ -31,7 +32,7 @@ use File::Find;
 
 my $target = shift;
 my @cfiles; # C files
-my @hfiles; # header files
+#my @hfiles; # header files
 my $ignore; # regexps to ignore
 my $is_cpp; # C or C++
 my @input;
@@ -107,7 +108,7 @@ sub checkFile {
   if (/\.c[cpx+]*$/) {
     push @cfiles, $_;
   } else {
-    push @hfiles, $_;
+#    push @hfiles, $_;
   }
 }
 
