@@ -1,6 +1,8 @@
 Jlint README
 ------------
 
+Description:
+------------
 Jlint will check your Java code and find bugs, inconsistencies and
 synchronization problems by doing data flow analysis and building a lock graph.
 
@@ -8,8 +10,12 @@ Original version (1.11) by Konstantin Knizhnik.
 Enhanced version (2.0) and a few bugfixes by Cyrille Artho.
 Version 2.1: FreeBSD port by Cyrille Artho, Visual C++ port by Maarten Braddels.
 
+Usage:
+------
 User guide is found in readme.html.
 
+Installation:
+------------
 System requirements:
 For compiling:	C++ compiler, C++ Standard Library with Standard Templates.
 For compiling the docs: Texinfo; type "make doc".
@@ -22,12 +28,31 @@ Installation:
 2. cd jlint
 3. make ; make install
 
+Compilation problems:
+---------------------
 If Jlint won't compile for your system, remove the flags -DHASH_TABLE and
 -DSLIST in the Makefile, or upgrade to a newer version of the STL.
+
+People with an old compiler (e.g., egcs on RedHat 6.x) should comment out
+two lines (thanks to Eric A. Raymond for this patch):
+
+jlint.cc
+Line
+57  // Commented out by EAR to compile on Linux
+58  //message_node* message_node::hash_table[1023];
+
+message_node.cc
+3  // Commented out extern by EAR to compile on Linux
+4  /* extern */ message_node* message_node::hash_table[1023];
 
 Developer info: you can update the Makefile by typing
 ./mkmf.pl jlint antic readme <Makefile >__tmp__ ; mv __tmp__ Makefile
 
+Bugs:
+-----
 Send bug reports to cyrille@artho.com, Subject: Jlint.
 
+Acknowledgements:
+-----------------
+Thanks to all the people mentioned above.
 Special thanks to Ernst de Haan for providing a FreeBSD account for testing.
