@@ -33,8 +33,8 @@ Compilation problems:
 If Jlint won't compile for your system, remove the flags -DHASH_TABLE and
 -DSLIST in the Makefile, or upgrade to a newer version of the STL.
 
-People with an old compiler (e.g., egcs on RedHat 6.x) should comment out
-two lines (thanks to Eric A. Raymond for this patch):
+People with an old compiler (e.g., egcs 2.91 on RedHat GNU/Linux 6.x)
+should comment out two lines (thanks to Eric A. Raymond for this patch):
 
 jlint.cc
 Line
