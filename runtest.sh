@@ -5,7 +5,7 @@
 WRONGARGS=66
 if [ $# -ne 1 ]
 then
-    echo "Usage: `basename $0` int max    where you want to run tests 1 to max"
+    echo "Usage: `basename $0` max     # (runs tests 1 to max)"
     exit $WRONGARGS
 fi
 
