@@ -26,7 +26,7 @@ LFLAGS=-g
 # Directory to place executables
 INSTALL_DIR=/usr/local/bin
 
-all: antic jlint
+all: antic jlint doc
 
 antic.o: antic.c
 	$(CC) $(CFLAGS) antic.c
@@ -35,10 +35,13 @@ antic: antic.o
 	$(CC) $(LFLAGS) -o antic antic.o
 
 clean: 
-	rm -f  *.o *.exe core *~ *.his *.class jlint antic
+	rm -f  *.o *.exe core *~ *.his *.class jlint antic readme.html readme.pdf
 
-targz: clean
-	cd ..; tar -cvzf jlint.tar.gz jlint/antic.c jlint/BUGS jlint/Makefile jlint/*.msg jlint/*.hh jlint/*.cc jlint/*.d; cd jlint
+doc: readme.texi
+	texi2html -monolithic readme.texi; texi2pdf readme.texi
+
+targz:
+	cd ..; tar -cvzf jlint.tar.gz jlint/antic.c jlint/BUGS jlint/Makefile jlint/*.msg jlint/*.hh jlint/*.cc jlint/*.d jlint/README jlint/TODO jlint/readme.texi; cd jlint
 
 install:	
 	cp jlint antic $(INSTALL_DIR)
