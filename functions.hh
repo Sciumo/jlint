@@ -16,6 +16,10 @@ class utf_string;
 #ifdef __FreeBSD__
 #define __VALIST va_list
 #endif
+// so does OpenBSD
+#ifdef __OpenBSD__
+#define __VALIST va_list
+#endif
 // so does MSVC++
 #ifdef VISUAL_CPP
 #define __VALIST va_list

@@ -1,6 +1,6 @@
 #include "message_node.hh"
 
-extern message_node* message_node::hash_table[1023];
+message_node* message_node::hash_table[1023];
 
 bool message_node::find(char* msg_text) 
 {

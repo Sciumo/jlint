@@ -29,8 +29,12 @@ LFLAGS=-g
 # Directory to place executables
 INSTALL_DIR=/usr/local/bin
 
+# Version number
+# VERSION=`grep VERSION jlint.hh | sed 's/.*N //'`
+VERSION=2.2
+
 # Files that go into distro
-DISTFILES=jlint/antic.c jlint/BUGS jlint/Makefile jlint/*.msg jlint/*.hh jlint/*.cc jlint/*.d jlint/README jlint/TODO jlint/CHANGELOG jlint/COPYING jlint/manual.texi jlint/manual.html jlint/manual.pdf jlint/jlint.sh jlint/mkmf.pl
+DISTFILES=`ls jlint-$(VERSION)/{antic.c,BUGS,Makefile,*.msg,*.hh,*.cc,*.d,README,TODO,CHANGELOG,COPYING,manual.texi,manual.html,manual.pdf,jlint.sh,mkmf.pl}`
 
 # Makefile rules
 
@@ -43,7 +47,7 @@ antic: antic.o
 	$(CC) $(LFLAGS) -o antic antic.o
 
 clean: 
-	rm -f  *.o *.exe core *~ *.his *.class jlint antic manual.html manual.pdf
+	rm -f  *.o *.exe core *~ *.his *.class jlint antic manual.{html,pdf,aux,cp,fn,ky,log,pg,toc,tp,vr}
 
 doc: manual.texi
 	texi2html -monolithic manual.texi; texi2pdf manual.texi
@@ -51,10 +55,13 @@ doc: manual.texi
 dist: doc targz zip
 
 targz:
-	cd ..; tar -chvzf jlint.tar.gz $(DISTFILES); cd jlint
+	if [ $(VERSION) != `grep VERSION jlint.hh | sed 's/.*N //'` ]; then echo "Check version numbers!"; exit 1; fi
+	if [ ! -e ../jlint-$(VERSION) ]; then ln -s $(PWD) ../jlint-$(VERSION); fi
+	cd ..; tar -chvzf jlint-$(VERSION).tar.gz $(DISTFILES)
 
 zip:
-	cd ..; rm -f jlint.zip; zip -v jlint $(DISTFILES) `find jlint/jlintwin32 | grep -v CVS`; cd jlint
+	if [ ! -e ../jlint-$(VERSION) ]; then ln -s $(PWD) ../jlint-$(VERSION); fi
+	cd ..; rm -f jlint-$(VERSION).zip; zip -v jlint-$(VERSION).zip $(DISTFILES) `find jlint-$(VERSION)/jlintwin32 | grep -v CVS`
 
 install:
 	cp jlint antic jlint.sh $(INSTALL_DIR)
