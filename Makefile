@@ -6,6 +6,7 @@
 CC=gcc
 CPP=g++
 
+# mit gxx 3.2
 #CC=gcc-3.2
 #CPP=g++-3.2
 
@@ -38,7 +39,7 @@ INSTALL_DIR=/usr/local/bin
 
 # Version number
 # VERSION=`grep VERSION jlint.hh | sed 's/.*N //'`
-VERSION=2.3
+VERSION=3.0
 
 # Files that go into distro
 DISTFILES=`ls jlint-$(VERSION)/{antic.c,BUGS,Makefile,*.msg,*.hh,*.cc,*.d,README,TODO,CHANGELOG,COPYING,manual.texi,manual.html,manual.pdf,jlint.sh,mkmf.pl}`
@@ -59,14 +60,19 @@ antic: antic.o
 
 clean: 
 	rm -f  *.o *.exe core *~ *.his *.class jlint antic manual.{html,pdf,aux,cp,fn,ky,log,pg,toc,tp,vr}
-	if [ -d ./log ]; then rm -f ./log/*.{err,errfiles,log}; fi
+	if [ -d ./tests/log ]; then rm -f ./tests/log/*.{err,errfiles,log}; rm -f ./tests/log/test.{diff,err}; fi
 	if [ -d ./tests ]; then rm -f tests.tar.bz2; fi
 
 doc:  manual.texi
 	texi2html -monolithic manual.texi; texi2pdf manual.texi
 
-dist:  	doc targz zip
-	chmod 644 ../jlint-*.{tar.gz,zip}
+dist:  	doc tarbz targz zip
+	chmod 644 ../jlint-*.{tar.bz2,tar.gz,zip}
+
+tarbz:
+	if [ $(VERSION) != `grep VERSION jlint.hh | sed 's/.*N //'` ]; then echo "Check version numbers!"; exit 1; fi
+	if [ ! -e ../jlint-$(VERSION) ]; then ln -s $(PWD) ../jlint-$(VERSION); fi
+	cd ..; tar -chv --bzip2 -f jlint-$(VERSION).tar.bz2 $(DISTFILES)
 
 targz:
 	if [ $(VERSION) != `grep VERSION jlint.hh | sed 's/.*N //'` ]; then echo "Check version numbers!"; exit 1; fi
@@ -74,13 +80,20 @@ targz:
 	cd ..; tar -chvzf jlint-$(VERSION).tar.gz $(DISTFILES)
 
 zip:
+	if [ $(VERSION) != `grep VERSION jlint.hh | sed 's/.*N //'` ]; then echo "Check version numbers!"; exit 1; fi	
 	if [ ! -e ../jlint-$(VERSION) ]; then ln -s $(PWD) ../jlint-$(VERSION); fi
 	cd ..; rm -f jlint-$(VERSION).zip; zip -v jlint-$(VERSION).zip $(DISTFILES) `find jlint-$(VERSION)/jlintwin32 | grep -v CVS`
 
-test-dist:	doc test-tarbz test-targz test-zip
+test-dist:	doc test-files-tar test-tarbz test-targz zip
+	chmod 644 ../jlint-*.{tar.bz2,tar.gz,zip}
+
+test-files-tar:
+	tar -chv --bzip2 -f tests.tar.bz2 tests/
 
 test-tarbz:
-	if [ -e README.tests ]; then tar -chv --bzip2 -f tests.tar.bz2 tests/ log/ README.tests; else tar -chv --bzip2 -f tests.tar.bz2 tests/ log/; fi
+	if [ $(VERSION) != `grep VERSION jlint.hh | sed 's/.*N //'` ]; then echo "Check version numbers!"; exit 1; fi
+	if [ ! -e ../jlint-$(VERSION) ]; then ln -s $(PWD) ../jlint-$(VERSION); fi
+	cd ..; tar -chv --bzip2 -f jlint-$(VERSION).tar.bz2 $(TESTDISTFILES)
 
 test-targz:
 	if [ $(VERSION) != `grep VERSION jlint.hh | sed 's/.*N //'` ]; then echo "Check version numbers!"; exit 1; fi
@@ -88,6 +101,7 @@ test-targz:
 	cd ..; tar -chvzf jlint-$(VERSION).tar.gz $(TESTDISTFILES)
 
 test-zip:
+	if [ $(VERSION) != `grep VERSION jlint.hh | sed 's/.*N //'` ]; then echo "Check version numbers!"; exit 1; fi
 	if [ ! -e ../jlint-$(VERSION) ]; then ln -s $(PWD) ../jlint-$(VERSION); fi
 	cd ..; rm -f jlint-$(VERSION).zip; zip -v jlint-$(VERSION).zip $(TESTDISTFILES) `find jlint-$(VERSION)/jlintwin32 | grep -v CVS`
 
