@@ -11,7 +11,7 @@
 #ifndef __JLINT_HH__
 #define __JLINT_HH__
 
-#define VERSION 2.1
+#define VERSION 2.2
 
 #include "types.hh"
 #include "message_node.hh"
