@@ -3,8 +3,8 @@
 # Makefile for Unix and GNU/Linux with gcc/g++ compiler
 # Edit here:
 
-CC=gcc-3.3
-CPP=g++-3.3
+CC=gcc
+CPP=g++
 
 # mit gxx 3.2
 #CC=gcc-3.2

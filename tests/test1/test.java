@@ -45,12 +45,12 @@ class base_class {
 	}
 	x &= 31;
 	if ((++x & 1024) == 0) { // aways true
-	    x <<= ++x; // shift count can be grater than 31
+	    x <<= ++x; // shift count can be greater than 31
 	} 
 	return 0;
     }	
     static public int increment(base_class bc) { 
-	return ++bc.x; //+ varible bc may be null 
+	return ++bc.x; //+ variable bc may be null 
     }
 }
 
@@ -65,7 +65,7 @@ class derived_class extends base_class {
 		if (String.valueOf(1) == "1") //+ using of == for Strings
 		    return;
 	    if (c >= 0) { //+ always true
-		i <<= 32 - (i & 31); //+ shix[ft counter can be greater than 31
+		i <<= 32 - (i & 31); //+ shift counter can be greater than 31
 		i = (i & 8) >> 5; //+ result of operation is always 0
 	    }
 	    i = s & 3;
@@ -80,7 +80,7 @@ class derived_class extends base_class {
 		//+ BREAK is missed
 	      case 4: //+ constant is out of range
 		while (i != 0); //+ condition is always false
-		    i--; //+ wrong aasumption about while body
+		    i--; //+ wrong assumption about while body
 		i = 1<<i - 1; //+ wrong assumption about operators priorities
 	    }    
 	} else if (s <= 0) { //+ Can be replaced with == 0
@@ -125,7 +125,7 @@ class Thread1 implements Executable {
     public int x;
     Thread2 t;
     synchronized public void foo() { 
-        t.x = 0; //+ non-synhronized access to data
+        t.x = 0; //+ non-synchronized access to data
 	t.f(); //+ can be a source of deadlock
     }
     public void reset() {
@@ -176,6 +176,3 @@ class Thread2 {
 	t.f(); //+ synchronized method Thread1.f() can call wait
     }
 }
-
-
-
