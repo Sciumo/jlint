@@ -1,5 +1,7 @@
 Jlint changelog:
 
+Version 2.3: (Trivial) port to LinuxPPC and Mac OS X.
+
 Version 2.2: Applied Eric A. Raymond's compiler compatibility
 patch. Removed -DHASH_TABLE in the Makefile due to some problems (it
 can still be enabled if needed). OpenBSD port (thanks to Kevin Lo for
