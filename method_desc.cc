@@ -83,9 +83,6 @@ void method_desc::check_invocations()
 bool method_desc::build_call_graph(method_desc* caller, callee_desc* callee, 
                                    int caller_attr)
 {
-  if (caller == this) {
-    return false; // work around bug...
-  }
   callee->backtrace = caller;
   for (overridden_method* ovr = overridden; ovr != NULL; ovr = ovr->next) { 
     ovr->method->build_call_graph(caller, callee, caller_attr);
@@ -2465,6 +2462,7 @@ void method_desc::parse_code(constant** constant_pool,
             }
           }
         } // end of wait/notify treatment
+
         if ((cop == invokespecial) && (mth_name == "finalize")) {
           super_finalize = true;
         } else { 
@@ -2473,9 +2471,10 @@ void method_desc::parse_code(constant** constant_pool,
           if (cop != invokestatic && sp[-fp].type == tp_self) {
             call_attr |= callee_desc::i_self;
           } 
-          if ((cls->locks.owns(is_this)) || in_monitor) {
+          if (in_monitor) {
             call_attr |= callee_desc::i_synchronized;
           }
+
           callees = new callee_desc(cls, method, callees,
                                     get_line_number(addr), call_attr);
 
@@ -2488,6 +2487,7 @@ void method_desc::parse_code(constant** constant_pool,
             // exception: constructors can't own locks
             method->attr |= m_concurrent;
             Lock curr = cls->locks.getInnermost();
+
             if (curr == is_this) { 
               call_attr |= callee_desc::i_self; 
             }
@@ -2506,7 +2506,9 @@ void method_desc::parse_code(constant** constant_pool,
               }
 
               if ((!(method->locksAtEntry.owns(curr))) &&
-                  (sp[-fp].equals == is_this) // (method->cls == cls)
+                  (sp[-fp].equals == is_this) && // (method->cls == cls)
+                  (! attr & m_synchronized)
+                  // synch. methods are already covered by other mechanisms
                   ) {
                 // context at method entry
                 
@@ -2721,6 +2723,7 @@ void method_desc::parse_code(constant** constant_pool,
               // add call from a.<synch> to b.<synch>
               int call_attr = 0;
               call_attr |= callee_desc::i_synchronized;
+
               if (sp->equals->cls == cls) {
                 call_attr |= callee_desc::i_self;
               } 
