@@ -220,7 +220,7 @@ void class_desc::global_analysis()
   }
     
   //
-  // Check non-synchrnized access to variables by concurrent methods
+  // Check non-synchronized access to variables by concurrent methods
   // (race condition) and detect unchecked accessed to formal parameters
   // of method which can be passed "null" value in some invocation of 
   // this method
@@ -230,7 +230,7 @@ void class_desc::global_analysis()
   }
     
   //
-  // Explore class dependency grpah to detect possible sources of 
+  // Explore class dependency graph to detect possible sources of 
   // deadlocks
   //
   graph_vertex::verify();

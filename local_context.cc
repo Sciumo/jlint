@@ -1,8 +1,15 @@
 #include "local_context.hh"
 
-//
-// Methods of local_context class
-//
+/*
+** every subclass of local_context has a transfer method which keeps track
+** of the variable states during branching. These transfer methods are 
+** called in method_desc::parse_code(
+**                constant** constant_pool, const field_desc* is_this)
+** for every bytecode and at the end after parsing all the bytecode of the method 
+** before cleanup to pop up all the local variables.
+*/
+
+
 
 vbm_operand* ctx_push_var::transfer(method_desc* method, vbm_operand* sp, 
                                     byte, byte&)
@@ -437,7 +444,9 @@ vbm_operand* ctx_split::transfer(method_desc* method, vbm_operand* sp,
   return sp;
 }
 
- 
+/* 
+** merge states after split
+*/ 
 
 vbm_operand* ctx_merge::transfer(method_desc* method, vbm_operand* sp, 
                                  byte, byte& prev_cop)
@@ -578,10 +587,10 @@ vbm_operand* ctx_entry_point::transfer(method_desc* method, vbm_operand* sp,
 #if 1
   //
   // As far as state of variable is not followed correctly in case of 
-  // subroutine execution or catching exception, the obviouse approach is
+  // subroutine execution or catching exception, the obvious approach is
   // to reset state of all local variables. But in this case we will loose
   // useful information, so I decide to keep variables state, 
-  // hopping that it will not cause confusing Jlint messages.
+  // hoping that it will not cause confusing Jlint messages.
   //
   var_desc* var = method->vars;
   for (int i = method->n_vars; --i >= 0; var++) { 
@@ -611,7 +620,7 @@ vbm_operand* ctx_entry_point::transfer(method_desc* method, vbm_operand* sp,
   sp->mask = var_desc::vs_not_null;
   sp->min = 0;
   sp->max = MAX_ARRAY_LENGTH;
-  return sp+1; // execption object is pushed on stack
+  return sp+1; // exception object is pushed on stack
 }
    
 

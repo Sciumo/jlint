@@ -4,12 +4,12 @@
 # Edit here:
 
 #mit default gxx
-CC=gcc
-CPP=g++
+#CC=gcc
+#CPP=g++
 
 # mit gxx 3.2
-#CC=gcc-3.2
-#CPP=g++-3.2
+CC=gcc-3.2
+CPP=g++-3.2
 
 # Hints:
 # if you use egcs-2.90.* version of GCC please add option -fno-exceptions 
@@ -18,15 +18,17 @@ CPP=g++
 ###############################################################################
 
 # Debug version
-#CFLAGS = -c -Wall -O0 -g -DSLIST -DDUMP_EDGES -DDEBUG -DDUMP_MONITOR
-#CFLAGS = -c -Wall -O0 -g -DSLIST -DHASH_TABLE -DDUMP_EDGES -DDUMP_BYTE_CODES -DPRINT_PC -DDUMP_STACK -DDUMP_MONITOR -DDEBUG
+#CFLAGS = -c -Wall -O0 -g  -DDUMP_EDGES -DDEBUG -DDUMP_MONITOR
+#CFLAGS = -c -Wall -O0 -g  -DDUMP_EDGES -DDUMP_BYTE_CODES -DPRINT_PC -DDUMP_STACK -DDUMP_MONITOR -DDEBUG
+# DSLIST DHASH_TABLE removed because it wouldn't compile otherwise on gcc 3.x
+
 
 # Optimized version
 
 CFLAGS = -c -Wall -O2 -g
 # -DSLIST removed because it wouldn't compile under gcc 3.x
 # add -DHASH_TABLE for extra speed (may sometimes produce inconsistent results)
-# add -march=i486  if using gcc 3.3, due to a bug in libstdc++
+# you may have to add -march=i486  if using gcc 3.3, due to a bug in libstdc++
 
 # Optimized version with switched off asserts
 #CFLAGS = -c -Wall -O2 -g -DSLIST -DNDEBUG

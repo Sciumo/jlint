@@ -504,10 +504,26 @@ bool parse_class_file(byte* fp)
                sizeof(local_context*)*(code_length+1));
 
         int exception_table_length = unpack2(fp); fp += 2;
+
+	/*  add new entry for exception-handles.It is expected
+	** that the handles are ordered. Only one handle for 
+	** every byte code adress. eg: in the following example only 
+	** add two entries at position 16 and 25 . 
+	** from         to         handle
+	**  2           10           16
+	** 12           14           16
+	** 20           23           25
+	*/
+
+	int old_handler_pc = -1;
+
         while (--exception_table_length >= 0) { 
           int handler_pc = unpack2(fp+4);
-          new ctx_entry_point(&method->context[handler_pc]); 
-          fp += 8;
+	  if ( handler_pc != old_handler_pc) {
+	    new ctx_entry_point(&method->context[handler_pc]); 
+	  }
+	  fp += 8;
+	  old_handler_pc = handler_pc;
         }
 
         int method_attr_count = unpack2(fp); fp += 2;

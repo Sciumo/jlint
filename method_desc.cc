@@ -501,7 +501,7 @@ void method_desc::basic_blocks_analysis()
         new ctx_reset(&context[addr+offs], var_store_count, n_vars);
       } else if (offs > 0) { // forward jump
         new ctx_merge(&context[addr+offs],
-                      new ctx_split(&context[addr], ctx_split::jmp_forward));
+		      new ctx_split(&context[addr], ctx_split::jmp_forward));
       }
       pc += 5;
       break;
@@ -618,7 +618,7 @@ void method_desc::parse_code(constant** constant_pool,
                              const field_desc* is_this)
 {
 #ifdef DEBUG
-        printf("Method %s\n", name.as_asciz());
+  printf("Method %s\n", name.as_asciz());
 #endif
   const int indirect = 0x100;
   byte* pc = code;
@@ -634,7 +634,7 @@ void method_desc::parse_code(constant** constant_pool,
   local_context* ctx;
   byte prev_cop = nop;
   bool super_finalize = false;
-
+  
 #ifdef INT8_DEFINED
   int8 left_min;
   int8 left_max;
@@ -1094,6 +1094,7 @@ void method_desc::parse_code(constant** constant_pool,
         var_store_count[cop - istore_0] += 1;
       }
       break;
+
     case astore_0:
     case astore_1:
     case astore_2:
@@ -2556,15 +2557,15 @@ void method_desc::parse_code(constant** constant_pool,
                 method->callees =
                   new callee_desc(obj_cls, method, method->callees,
                                   get_line_number(addr), call_attr);
-
+		
                 // lock was not in list, add to call graph
-
+		
                 int caller_attr = 0;
                 // caller_attr |= method_desc::m_synchronized;
                 // attr |= m_synchronized; // crucial flag for later analysis?
                 method->build_call_graph(caller_method, method->callees,
                                          caller_attr);
-
+		
                 // add edge for pseudo method to call graph
               }
             }
