@@ -45,7 +45,7 @@ doc: manual.texi
 dist: doc targz
 
 targz:
-	cd ..; tar -cvzf jlint.tar.gz jlint/antic.c jlint/BUGS jlint/Makefile jlint/*.msg jlint/*.hh jlint/*.cc jlint/*.d jlint/README jlint/TODO jlint/CHANGELOG jlint/COPYING jlint/manual.texi jlint/manual.html jlint/manual.pdf jlint/jlint.sh jlint/mkmf.pl; cd jlint
+	cd ..; tar -chvzf jlint.tar.gz jlint/antic.c jlint/BUGS jlint/Makefile jlint/*.msg jlint/*.hh jlint/*.cc jlint/*.d jlint/README jlint/TODO jlint/CHANGELOG jlint/COPYING jlint/manual.texi jlint/manual.html jlint/manual.pdf jlint/jlint.sh jlint/mkmf.pl; cd jlint
 
 install:
 	cp jlint antic jlint.sh $(INSTALL_DIR)
