@@ -36,7 +36,7 @@ do
     else 
 	echo test directory $DIR/tests/test$I does not exist
     fi
-    echo  test$I runs
+    echo test$I OK
     I=`expr $I + 1`
 done
 
