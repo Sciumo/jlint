@@ -1,7 +1,7 @@
 #ifndef MESSAGE_NODE_HH
 #define MESSAGE_NODE_HH
-#include <string>
-#include "types.hh"
+//#include <string>
+//#include "types.hh" // included by functions.hh
 #include "functions.hh"
 
 class message_node {

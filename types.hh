@@ -9,6 +9,11 @@
 typedef int      int4;
 typedef unsigned nat4;
 
+#if defined(__GNUC__)
+#define INT8_DEFINED 1
+typedef long long          int8;
+typedef unsigned long long nat8;
+#else
 #if defined(_WIN32)
 #define INT8_DEFINED 1
 typedef __int64 int8;
@@ -18,11 +23,6 @@ typedef unsigned __int64 nat8;
 #define INT8_DEFINED 1
 typedef   signed long int8;
 typedef unsigned long nat8;
-#else
-#if defined(__GNUC__)
-#define INT8_DEFINED 1
-typedef long long          int8;
-typedef unsigned long long nat8;
 #endif
 #endif
 #endif

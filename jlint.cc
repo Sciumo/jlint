@@ -129,7 +129,12 @@ int get_type(utf_string const& str)
 // All messages are reported by this function
 // 
 
-void format_message(int code, utf_string const& file, int line, va_list ap)
+// cygwin fix:
+#ifndef __VALIST
+#define __VALIST va_list
+#endif
+
+void format_message(int code, utf_string const& file, int line, __VALIST ap)
 {
   static int loop_id;
   static message_node *first, *last;
