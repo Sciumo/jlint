@@ -9,7 +9,11 @@ class utf_string;
 
 // cygwin fix:
 #ifndef __VALIST
+#ifdef va_list
 #define __VALIST va_list
+#else
+#define __VALIST void*
+#endif
 #endif
 
 extern void format_message(int code, utf_string const& file, int line, __VALIST ap);

@@ -129,11 +129,6 @@ int get_type(utf_string const& str)
 // All messages are reported by this function
 // 
 
-// cygwin fix:
-#ifndef __VALIST
-#define __VALIST va_list
-#endif
-
 void format_message(int code, utf_string const& file, int line, __VALIST ap)
 {
   static int loop_id;

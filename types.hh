@@ -187,8 +187,12 @@ char const* const vbm_instruction_mnemonic[] = {
 #define STORE_INT8(dst,field,src) (dst)[0].field = HIGH_PART(src),\
           (dst)[1].field = LOW_PART(src) 
 
+#ifndef INT8_MAX
 #define INT8_MAX      ((int8)((nat8)-1 >> 1))
+#endif
+#ifndef INT8_MIN
 #define INT8_MIN      ((int8)(((nat8)-1 >> 1) + 1))
+#endif
 #define INT8_ZERO     ((int8)0)
 #define INT8_ALL_BITS ((int8)-1)
 #endif
