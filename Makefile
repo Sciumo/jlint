@@ -43,6 +43,10 @@ VERSION=2.3
 # Files that go into distro
 DISTFILES=`ls jlint-$(VERSION)/{antic.c,BUGS,Makefile,*.msg,*.hh,*.cc,*.d,README,TODO,CHANGELOG,COPYING,manual.texi,manual.html,manual.pdf,jlint.sh,mkmf.pl}`
 
+TESTDISTFILES=`ls jlint-$(VERSION)/{antic.c,BUGS,Makefile,*.msg,*.hh,*.cc,*.d,README,TODO,CHANGELOG,COPYING,manual.texi,manual.html,manual.pdf,jlint.sh,mkmf.pl,runtest.sh,showdiff.sh,showerror.sh,testall.sh,README.tests,tests.tar.bz2}`
+
+
+
 # Makefile rules
 
 all: antic jlint
@@ -55,11 +59,13 @@ antic: antic.o
 
 clean: 
 	rm -f  *.o *.exe core *~ *.his *.class jlint antic manual.{html,pdf,aux,cp,fn,ky,log,pg,toc,tp,vr}
+	if [ -d ./log ]; then rm -f ./log/*.{err,errfiles,log}; fi
+	if [ -d ./tests ]; then rm -f tests.tar.bz2; fi
 
-doc: manual.texi
+doc:  manual.texi
 	texi2html -monolithic manual.texi; texi2pdf manual.texi
 
-dist: doc targz zip
+dist:  	doc targz zip
 	chmod 644 ../jlint-*.{tar.gz,zip}
 
 targz:
@@ -70,6 +76,21 @@ targz:
 zip:
 	if [ ! -e ../jlint-$(VERSION) ]; then ln -s $(PWD) ../jlint-$(VERSION); fi
 	cd ..; rm -f jlint-$(VERSION).zip; zip -v jlint-$(VERSION).zip $(DISTFILES) `find jlint-$(VERSION)/jlintwin32 | grep -v CVS`
+
+test-dist:	doc test-tarbz test-targz test-zip
+
+test-tarbz:
+	if [ -e README.tests ]; then tar -chv --bzip2 -f tests.tar.bz2 tests/ log/ README.tests; else tar -chv --bzip2 -f tests.tar.bz2 tests/ log/; fi
+
+test-targz:
+	if [ $(VERSION) != `grep VERSION jlint.hh | sed 's/.*N //'` ]; then echo "Check version numbers!"; exit 1; fi
+	if [ ! -e ../jlint-$(VERSION) ]; then ln -s $(PWD) ../jlint-$(VERSION); fi
+	cd ..; tar -chvzf jlint-$(VERSION).tar.gz $(TESTDISTFILES)
+
+test-zip:
+	if [ ! -e ../jlint-$(VERSION) ]; then ln -s $(PWD) ../jlint-$(VERSION); fi
+	cd ..; rm -f jlint-$(VERSION).zip; zip -v jlint-$(VERSION).zip $(TESTDISTFILES) `find jlint-$(VERSION)/jlintwin32 | grep -v CVS`
+
 
 install:
 	cp jlint antic jlint.sh $(INSTALL_DIR)
