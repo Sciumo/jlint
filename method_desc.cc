@@ -2,11 +2,11 @@
 
 void print_call_sequence(callee_desc* callee, int loop_id, int path_id)
 {
-    if (callee != NULL) { 
-	print_call_sequence((callee_desc*)callee->backtrace, loop_id, path_id);
-	callee->message(msg_loop, (void*)loop_id, (void*)path_id, 
-			callee->method);
-    }
+  if (callee != NULL) { 
+    print_call_sequence((callee_desc*)callee->backtrace, loop_id, path_id);
+    callee->message(msg_loop, (void*)loop_id, (void*)path_id, 
+                    callee->method);
+  }
 }
 
 int method_desc::demangle_method_name(char* buf)
@@ -93,7 +93,7 @@ bool method_desc::build_call_graph(method_desc* caller, callee_desc* callee,
 	    char buf[2][MAX_MSG_LENGTH];
 	    caller->demangle_method_name(buf[0]);
 	    demangle_method_name(buf[1]);
-	    printf("Call graph edge %s %d-> %s\n", buf[0], buf[1]);
+	    printf("Call graph edge %s -> %s\n", buf[0], buf[1]);
 #endif
 	    graph_edge* edge = new graph_edge(vertex, caller, callee);
 	    caller->vertex->attach(edge);
