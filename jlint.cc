@@ -25,10 +25,6 @@
 bool   verbose = false;
 int   max_shown_paths = 4;
 
-//
-// All messages are reported by this function
-// 
-
 int   n_messages;
 
 char* source_file_path;
@@ -126,6 +122,10 @@ int get_type(utf_string const& str)
   }
   return int(tag) + (indirect << 8);
 }
+
+//
+// All messages are reported by this function
+// 
 
 void format_message(int code, utf_string const& file, int line, va_list ap)
 {

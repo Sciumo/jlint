@@ -2439,6 +2439,7 @@ void method_desc::parse_code(class_desc* this_class,
                 }
                 *(out-1) = '\0';
                 message(msg_locklist, addr, this_class->monitors.size(), buf);
+                n_messages--; // avoid counting message twice
               }
             }
           }

@@ -216,10 +216,12 @@ char const* const vbm_instruction_mnemonic[] = {
 #define FILE_SEP '/'
 #endif
 
+// declared in jlint.cc:
 extern int max_shown_paths;
 extern char* source_file_path;
 extern int   source_file_path_len;
 extern bool  source_path_redefined;
-extern int verbose; // declared in jlint.cc
+extern int verbose;
+extern int n_messages;
 
 #endif
