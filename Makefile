@@ -41,7 +41,7 @@ doc: readme.texi
 	texi2html -monolithic readme.texi; texi2pdf readme.texi
 
 targz:
-	cd ..; tar -cvzf jlint.tar.gz jlint/antic.c jlint/BUGS jlint/Makefile jlint/*.msg jlint/*.hh jlint/*.cc jlint/*.d jlint/README jlint/TODO jlint/readme.texi; cd jlint
+	cd ..; tar -cvzf jlint.tar.gz jlint/antic.c jlint/BUGS jlint/Makefile jlint/*.msg jlint/*.hh jlint/*.cc jlint/*.d jlint/README jlint/TODO jlint/readme.texi jlint/readme.html jlint/readme.pdf; cd jlint
 
 install:	
 	cp jlint antic $(INSTALL_DIR)
