@@ -1,9 +1,9 @@
 //-< JLINT.H >-------------------------------------------------------+--------+
-// Jlint                      Version 1.11       (c) 1998  GARRET    |     ?  |
+// Jlint                      Version 1.2        (c) 1998  GARRET    |     ?  |
 // (Java Lint)                                                       |   /\|  |
 //                                                                   |  /  \  |
 //                          Created:     28-Mar-98    K.A. Knizhnik  | / [] \ |
-//                          Last update: 20-Aug-98    K.A. Knizhnik  | GARRET |
+//                          Last update: 15-Feb-01    Cyrille Artho  | GARRET |
 //-------------------------------------------------------------------+--------+
 // Java verifier 
 //-------------------------------------------------------------------+--------+
@@ -11,7 +11,7 @@
 #ifndef __JLINT_HH__
 #define __JLINT_HH__
 
-#define VERSION 1.11
+#define VERSION 1.2
 
 #include "types.hh"
 #include "message_node.hh"

@@ -1,9 +1,9 @@
 //-< JLINT.CC >------------------------------------------------------+--------+
-// Jlint                      Version 1.12       (c) 1998  GARRET    |     ?  |
+// Jlint                      Version 1.2        (c) 1998  GARRET    |     ?  |
 // (Java Lint)                                                       |   /\|  |
 //                                                                   |  /  \  |
 //                          Created:     28-Mar-98    K.A. Knizhnik  | / [] \ |
-//                          Last update: 08-Nov-00    K.A. Knizhnik  | GARRET |
+//                          Last update: 15-Feb-01    Cyrille Artho  | GARRET |
 //-------------------------------------------------------------------+--------+
 // Java verifier 
 //-------------------------------------------------------------------+--------+
