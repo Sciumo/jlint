@@ -17,9 +17,9 @@ class_desc::class_desc(utf_string const& str)
   if (FILE_SEP != '/') { 
     // Produce valid operationg system dependent file name
     for (char* p = source_file.as_asciz(); *p != '\0'; p++) { 
-	    if (*p == '/') { 
+      if (*p == '/') { 
         *p = FILE_SEP;
-	    } 
+      } 
     }
   }
 }
@@ -30,7 +30,7 @@ class_desc* class_desc::get(utf_string const& str)
   class_desc* cls;
   for (cls = hash_table[h]; cls != NULL; cls = cls->collision_chain) { 
     if (str == cls->name) { 
-	    return cls;
+      return cls;
     }
   }
   cls = new class_desc(str);
@@ -45,7 +45,7 @@ method_desc* class_desc::get_method(utf_string const& mth_name,
 { 
   for (method_desc* method = methods; method != NULL; method = method->next){
     if (method->name == mth_name && method->desc == mth_desc) { 
-	    return method;
+      return method;
     }
   }
   return methods = new method_desc(mth_name, mth_desc, this, methods);
@@ -82,7 +82,7 @@ bool class_desc::implements(const char* interface_name)
   }
   for (int i = n_bases; --i >= 0;) { 
     if (bases[i]->implements(interface_name)) {  
-	    return true;
+      return true;
     }
   }
   return false;    
@@ -97,21 +97,21 @@ void class_desc::check_inheritance(class_desc* derived)
 {
   for (field_desc* bf = fields; bf != NULL; bf = bf->next) {
     for (field_desc* df = derived->fields; df != NULL; df = df->next) {
-	    if (bf->name == df->name) { 
+      if (bf->name == df->name) { 
         message_at(msg_field_redefined, derived->source_file, 0, 
                    &bf->name, derived, this);
         break;
-	    }
+      }
     }
   }
   for (method_desc* bm = methods; bm != NULL; bm = bm->next) { 
     if (bm->is_special_method() || (bm->attr & method_desc::m_static)) { 
-	    continue;
+      continue;
     }
     bool overridden = false;
     method_desc* match = NULL;
     for (method_desc* dm=derived->methods; dm != NULL; dm=dm->next) {
-	    if (bm->name == dm->name) { 
+      if (bm->name == dm->name) { 
         match = dm;
         if (bm->desc == dm->desc) { 
           overridden = true;
@@ -130,10 +130,10 @@ void class_desc::check_inheritance(class_desc* derived)
           }
           break;
         }
-	    } 		    
+      } 		    
     }
     if (match != NULL && !overridden) { 
-	    message_at(msg_not_overridden, derived->source_file, 
+      message_at(msg_not_overridden, derived->source_file, 
                  match->first_line, bm, derived);
     }
   }
@@ -177,16 +177,16 @@ void class_desc::build_class_info()
   method_desc* equals_hashcode_match = NULL;
   for (method_desc* bm = methods; bm != NULL; bm = bm->next) { 
     if (bm->name == "equals") {
-	    overriden_equals = true;
-	    equals_hashcode_match = bm;
+      overriden_equals = true;
+      equals_hashcode_match = bm;
     } else if (bm->name == "hashCode") {
-	    overriden_hashcode = true;
-	    equals_hashcode_match = bm;
+      overriden_hashcode = true;
+      equals_hashcode_match = bm;
     }
   }
   if (overriden_equals != overriden_hashcode) {
     if (overriden_equals) {
-	    message_at(msg_hashcode_not_overridden, source_file, 
+      message_at(msg_hashcode_not_overridden, source_file, 
                  equals_hashcode_match->first_line);
     } else {
       message_at(msg_equals_not_overridden, source_file, 

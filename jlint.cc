@@ -49,7 +49,7 @@ unsigned int string_hash_function(byte* p) {
   while(*p) { 
     h = (h << 4) + *p++;
     if ((g = h & 0xF0000000) != 0) { 
-	    h ^= g >> 24;
+      h ^= g >> 24;
     }
     h &= ~g;
   }
@@ -77,22 +77,22 @@ int get_number_of_parameters(utf_string const& str)
   int n_params = 0;
   while (*p != ')') { 
     switch (*p++) { 
-	  case '[':
-	    while (*p == '[') p += 1;
-	    if (*p++ == 'L') { 
+    case '[':
+      while (*p == '[') p += 1;
+      if (*p++ == 'L') { 
         while (*p++ != ';');
-	    }
-	    n_params += 1;
-	    break;
-	  case 'D':
-	  case 'J':
-	    n_params += 2;
-	    break;
-	  case 'L':
-	    while (*p++ != ';');
-	    nobreak;
-	  default:
-	    n_params += 1;
+      }
+      n_params += 1;
+      break;
+    case 'D':
+    case 'J':
+      n_params += 2;
+      break;
+    case 'L':
+      while (*p++ != ';');
+      nobreak;
+    default:
+      n_params += 1;
     }
   }
   return n_params;
@@ -134,7 +134,7 @@ void format_message(int code, utf_string const& file, int line, va_list ap)
   static char* compound_message;
   void* parameter[MAX_MSG_PARAMETERS];
   int   n_parameters = 2;
-	
+  
   if (code == msg_loop || code == msg_sync_loop) { // extract loop identifier
     parameter[n_parameters++] = va_arg(ap, void*);
   }
@@ -153,7 +153,7 @@ void format_message(int code, utf_string const& file, int line, va_list ap)
             delete msg;
             n_messages += 1;
           } while ((msg = next) != NULL);
-          fprintf(history, "%s\n", compound_message);	
+          fprintf(history, "%s\n", compound_message);  
         }
         delete[] compound_message;
         compound_message = NULL;
@@ -163,11 +163,11 @@ void format_message(int code, utf_string const& file, int line, va_list ap)
       && msg_table[code].enabled)
     {
       static int prev_line = 0;
-	
+  
       char  msg_buf[MAX_MSG_LENGTH];
       char  his_buf[MAX_MSG_LENGTH];
       char* hp = his_buf;
-	
+  
       if (line == 0) { 
         line = ++prev_line; // avoid several messages with 0 line number
       } else { 
@@ -179,7 +179,7 @@ void format_message(int code, utf_string const& file, int line, va_list ap)
       if (history) { 
         hp += sprintf(hp, "%s", msg_table[code].name);
       }
-	    
+      
       char const* src = msg_table[code].format;
       char* dst = msg_buf;
 
@@ -287,8 +287,8 @@ void set_class_source_path(class_desc* cls)
   if (source_file_path_len != 0) { 
     char* class_file_name = cls->source_file.as_asciz();
     if (!source_path_redefined) { 
-	    char* dirend = strrchr(class_file_name, '/');
-	    if (dirend != NULL) { 
+      char* dirend = strrchr(class_file_name, '/');
+      if (dirend != NULL) { 
         int dirlen = dirend - class_file_name;
         if (dirlen <= source_file_path_len
             && memcmp(class_file_name, 
@@ -297,7 +297,7 @@ void set_class_source_path(class_desc* cls)
           {
             class_file_name = dirend+1;
           }
-	    }
+      }
     }
     char file_name_buf[MAX_MSG_LENGTH];
     int len = sprintf(file_name_buf, "%.*s%c%s", 
@@ -325,43 +325,43 @@ bool parse_class_file(byte* fp)
     constant* cp = NULL;
     int n_extra_cells = 0;
     switch (*fp) { 
-	  case c_utf8:
-	    cp = new const_utf8(fp);
-	    break;
-	  case c_integer:
-	    cp = new const_int(fp);
-	    break;
-	  case c_float:
-	    cp = new const_float(fp);
-	    break;
-	  case c_long:
-	    cp = new const_long(fp);
-	    n_extra_cells += 1;
-	    break;
-	  case c_double:
-	    cp = new const_double(fp);
-	    n_extra_cells += 1;
-	    break;
-	  case c_class:
-	    cp = new const_class(fp);
-	    break;
-	  case c_string:
-	    cp = new const_string(fp);
-	    break;
-	  case c_field_ref:
-	  case c_method_ref:
-	  case c_interface_method_ref:
-	    cp = new const_ref(fp);
-	    break;
-	  case c_name_and_type:
-	    cp = new const_name_and_type(fp);
-	    break;
+    case c_utf8:
+      cp = new const_utf8(fp);
+      break;
+    case c_integer:
+      cp = new const_int(fp);
+      break;
+    case c_float:
+      cp = new const_float(fp);
+      break;
+    case c_long:
+      cp = new const_long(fp);
+      n_extra_cells += 1;
+      break;
+    case c_double:
+      cp = new const_double(fp);
+      n_extra_cells += 1;
+      break;
+    case c_class:
+      cp = new const_class(fp);
+      break;
+    case c_string:
+      cp = new const_string(fp);
+      break;
+    case c_field_ref:
+    case c_method_ref:
+    case c_interface_method_ref:
+      cp = new const_ref(fp);
+      break;
+    case c_name_and_type:
+      cp = new const_name_and_type(fp);
+      break;
     }
     assert(cp != NULL);
     fp += cp->length();
     constant_pool[i] = cp;
     i += n_extra_cells;
-  }	    
+  }      
   int access_flags = unpack2(fp);
   fp += 2;
   int this_class_name = unpack2(fp);
@@ -385,13 +385,13 @@ bool parse_class_file(byte* fp)
     this_class->n_bases = interfaces_count + 1;
     this_class->bases = new class_desc*[interfaces_count + 1];
     this_class->bases[0] =
-	    class_desc::get(*(const_utf8*)constant_pool
+      class_desc::get(*(const_utf8*)constant_pool
                       [((const_class*)constant_pool[super_class_name])->name]);
     
     for (i = 1; i <= interfaces_count; i++) { 
-	    int interface_name = unpack2(fp);
-	    fp += 2;
-	    this_class->bases[i] = 
+      int interface_name = unpack2(fp);
+      fp += 2;
+      this_class->bases[i] = 
         class_desc::get(*(const_utf8*)constant_pool
                         [((const_class*)constant_pool[interface_name])->name]);
     }
@@ -405,11 +405,11 @@ bool parse_class_file(byte* fp)
     int desc_index = unpack2(fp); fp += 2;
     int attr_count = unpack2(fp); fp += 2;
     field_desc* field = 
-	    this_class->get_field(*(const_utf8*)constant_pool[name_index]);
+      this_class->get_field(*(const_utf8*)constant_pool[name_index]);
     field->attr |= access_flags;
     while (--attr_count >= 0) { 
-	    int attr_len = unpack4(fp+2); 
-	    fp += 6 + attr_len;
+      int attr_len = unpack4(fp+2); 
+      fp += 6 + attr_len;
     }
   }
    
@@ -425,8 +425,8 @@ bool parse_class_file(byte* fp)
     int attr_count = unpack2(fp+6); 
     fp += 8;
     while (--attr_count >= 0) { 
-	    int attr_len = unpack4(fp+2); 
-	    fp += 6 + attr_len;
+      int attr_len = unpack4(fp+2); 
+      fp += 6 + attr_len;
     }
   }
   int attr_count = unpack2(fp); fp += 2;
@@ -435,16 +435,16 @@ bool parse_class_file(byte* fp)
     int attr_len = unpack4(fp); fp += 4;
     utf_string attr(*(const_utf8*)constant_pool[attr_name]);
     if (attr == "SourceFile") { 
-	    int source_name = unpack2(fp); fp += 2;
-	    int file_name_idx = this_class->source_file.rindex(FILE_SEP);
-	    utf_string* file_name = (const_utf8*)constant_pool[source_name];
-	    if (file_name_idx >= 0) { 
+      int source_name = unpack2(fp); fp += 2;
+      int file_name_idx = this_class->source_file.rindex(FILE_SEP);
+      utf_string* file_name = (const_utf8*)constant_pool[source_name];
+      if (file_name_idx >= 0) { 
         this_class->source_file.append(file_name_idx+1, *file_name);
-	    } else { 
+      } else { 
         this_class->source_file = *file_name;
-	    }
+      }
     } else { 
-	    fp += attr_len;
+      fp += attr_len;
     }
   }
   fp = method_part;
@@ -454,19 +454,19 @@ bool parse_class_file(byte* fp)
     int name_index = unpack2(fp); fp += 2;
     int desc_index = unpack2(fp); fp += 2;
     int attr_count = unpack2(fp); fp += 2;
-	
+  
     const_utf8* mth_name = (const_utf8*)constant_pool[name_index];
     const_utf8* mth_desc = (const_utf8*)constant_pool[desc_index];
 
     method_desc* method = this_class->get_method(*mth_name, *mth_desc);
     method->attr |= access_flags;
     method->vars = NULL;
-	
+  
     while (--attr_count >= 0) { 
-	    int attr_name = unpack2(fp); fp += 2;
-	    int attr_len = unpack4(fp); fp += 4;
-	    utf_string attr(*(const_utf8*)constant_pool[attr_name]);
-	    if (attr == "Code") { 
+      int attr_name = unpack2(fp); fp += 2;
+      int attr_len = unpack4(fp); fp += 4;
+      utf_string attr(*(const_utf8*)constant_pool[attr_name]);
+      if (attr == "Code") { 
         int max_stack = unpack2(fp); fp += 2;
         int max_locals = unpack2(fp); fp += 2;
         int code_length = unpack4(fp); fp += 4;
@@ -549,9 +549,9 @@ bool parse_class_file(byte* fp)
         printf("Method %s\n", mth_name->as_asciz());
 #endif
         method->parse_code(this_class, constant_pool);
-	    } else { 
+      } else { 
         fp += attr_len;
-	    }
+      }
     }
   }
   for (i = 0; i < constant_pool_count; i++) { 
@@ -572,7 +572,7 @@ inline int stricmp(const char* p, const char* q)
     while (*q == '_') q += 1; // ignore '_'
     int diff = toupper(*(byte*)p) - toupper(*(byte*)q);
     if (diff != 0) {
-	    return diff;
+      return diff;
     }
     q += 1;
   } while (*p++ != 0);
@@ -593,8 +593,8 @@ void proceed_file(char* file_name, bool recursive = false)
       }
   } else { 
     if (strcmp(file_name, "..") == 0 || strcmp(file_name, ".") == 0) { 
-	    proceed_file(file_name, 1);
-	    return;
+      proceed_file(file_name, 1);
+      return;
     }
     if ((dir=FindFirstFile(file_name, &file_data)) == INVALID_HANDLE_VALUE)
       { 
@@ -604,7 +604,7 @@ void proceed_file(char* file_name, bool recursive = false)
   }
   if (dir != INVALID_HANDLE_VALUE) {
     do {
-	    if (!recursive || *file_data.cFileName != '.') { 
+      if (!recursive || *file_data.cFileName != '.') { 
         char file_path[MAX_PATH];
         char* file_dir = strrchr(file_name, '\\');
         char* file_name_with_path;
@@ -617,7 +617,7 @@ void proceed_file(char* file_name, bool recursive = false)
           file_name_with_path = file_data.cFileName;
         }
         proceed_file(file_name_with_path, recursive+1);
-	    } 
+      } 
     } while (FindNextFile(dir, &file_data));
     FindClose(dir);
     return;
@@ -627,11 +627,11 @@ void proceed_file(char* file_name, bool recursive = false)
   if (dir != NULL) { 
     struct dirent* entry;
     while ((entry = readdir(dir)) != NULL) { 
-	    if (*entry->d_name != '.') { 
+      if (*entry->d_name != '.') { 
         char full_name[MAX_PATH];
         sprintf(full_name, "%s/%s", file_name, entry->d_name);
         proceed_file(full_name, 2);
-	    }
+      }
     } 
     closedir(dir);
     return;
@@ -640,10 +640,10 @@ void proceed_file(char* file_name, bool recursive = false)
   if (recursive >= 2) { 
     int len = strlen(file_name); 
     if (len < 6 || stricmp(file_name + len - 6, ".class") != 0) {
-	    return;
+      return;
     }
   }
-		
+  	
   FILE* f = fopen(file_name, "rb");
   if (f == NULL) { 
     fprintf(stderr, "Failed to open file '%s'\n", file_name);
@@ -674,34 +674,34 @@ void proceed_file(char* file_name, bool recursive = false)
     byte* dp = directory;
 
     while (--count >= 0) {
-	    int uncompressed_size = unpack4_le(&dp[4+C_UNCOMPRESSED_SIZE]);
-	    int filename_length = unpack2_le(&dp[4+C_FILENAME_LENGTH]);
-	    int cextra_length = unpack2_le(&dp[4+C_EXTRA_FIELD_LENGTH]);
+      int uncompressed_size = unpack4_le(&dp[4+C_UNCOMPRESSED_SIZE]);
+      int filename_length = unpack2_le(&dp[4+C_FILENAME_LENGTH]);
+      int cextra_length = unpack2_le(&dp[4+C_EXTRA_FIELD_LENGTH]);
 
-	    if ((dp-directory)+filename_length+CREC_SIZE+4 > dir_size) { 
+      if ((dp-directory)+filename_length+CREC_SIZE+4 > dir_size) { 
         fprintf(stderr, "Bad format of ZIP file '%s'\n", file_name);
         break;
-	    }
-		
-	    byte local_rec_buffer[LREC_SIZE+4];
-	    int local_header_offset = 
+      }
+  	
+      byte local_rec_buffer[LREC_SIZE+4];
+      int local_header_offset = 
         unpack4_le(&dp[4+C_RELATIVE_OFFSET_LOCAL_HEADER]);
 
-	    if (fseek(f, local_header_offset, SEEK_SET) != 0
+      if (fseek(f, local_header_offset, SEEK_SET) != 0
           || fread(local_rec_buffer, sizeof local_rec_buffer, 1, f) != 1
           || memcmp(&local_rec_buffer[1], LOCAL_HDR_SIG, 3) != 0)
         {
           fprintf(stderr, "Bad format of ZIP file '%s'\n", file_name);
           break;
         }
-		
-	    int file_start = local_header_offset + (LREC_SIZE+4) +
+  	
+      int file_start = local_header_offset + (LREC_SIZE+4) +
         unpack2_le(&local_rec_buffer[4+L_FILENAME_LENGTH]) +
         unpack2_le(&local_rec_buffer[4+L_EXTRA_FIELD_LENGTH]);
 
-	    int filename_offset = CREC_SIZE+4;
+      int filename_offset = CREC_SIZE+4;
 
-	    if (uncompressed_size != 0) { 
+      if (uncompressed_size != 0) { 
         byte* buffer = new byte[uncompressed_size];
         if (fseek(f, file_start, SEEK_SET) != 0 
             || fread(buffer, uncompressed_size, 1, f) != 1) 
@@ -720,8 +720,8 @@ void proceed_file(char* file_name, bool recursive = false)
             }
           }
         delete[] buffer;
-	    }
-	    dp += filename_offset + filename_length + cextra_length; 
+      }
+      dp += filename_offset + filename_length + cextra_length; 
     }
     delete[] directory;
   } else { 
@@ -730,15 +730,15 @@ void proceed_file(char* file_name, bool recursive = false)
     fseek(f, 0, SEEK_SET);
     byte* buffer = new byte[file_size];
     if (fread(buffer, file_size, 1, f) != 1) { 
-	    fprintf(stderr, "Failed to read file '%s'\n", file_name);
+      fprintf(stderr, "Failed to read file '%s'\n", file_name);
     } else { 
-	    if (verbose) { 
+      if (verbose) { 
         fprintf(stderr, "Verify file '%s'\n", file_name); 
-	    }
-	    if (!parse_class_file(buffer)) { 
+      }
+      if (!parse_class_file(buffer)) { 
         fprintf(stderr, "File '%s' isn't correct Java class file\n", 
                 file_name);
-	    }
+      }
     }
     delete[] buffer;
   }
@@ -817,8 +817,8 @@ Message categories:\n");
   for (unsigned i = 0; i < items(msg_category_option); i++) { 
     message_category msg_cat = msg_category_option[i].msg_cat;
     if ((msg_cat & ~group) != 0) { 
-	    group = msg_cat;
-	    fprintf(stderr, "\n");
+      group = msg_cat;
+      fprintf(stderr, "\n");
     }
     fprintf(stderr, "  %s : %s\n", 
             msg_category_option[i].cat_name, 
@@ -827,14 +827,14 @@ Message categories:\n");
   if (verbose) { 
     fprintf(stderr, "\nMessages: (category:code: \"text\")\n");
     for (int i = 0; i < msg_last; i++) { 
-	    for (unsigned j = 0; j < items(msg_category_option); j++) { 
+      for (unsigned j = 0; j < items(msg_category_option); j++) { 
         if (msg_table[i].category == msg_category_option[j].msg_cat) {
           fprintf(stderr, "  %s:%s: \"%s\"\n", 
                   msg_category_option[j].cat_name,
                   msg_table[i].name, msg_table[i].format);
           break;
         }
-	    }
+      }
     }
   }
 }
@@ -850,12 +850,12 @@ int main(int argc, char* argv[])
 
   for (i = 1; i < argc; i++) { 
     if (*argv[i] == '-' || *argv[i] == '+') { 
-	    bool enabled = *argv[i] == '+';
-	    char* option = &argv[i][1];
-	    int n_cat = items(msg_category_option);
-	    msg_select_category_option* msg = msg_category_option;  
+      bool enabled = *argv[i] == '+';
+      char* option = &argv[i][1];
+      int n_cat = items(msg_category_option);
+      msg_select_category_option* msg = msg_category_option;  
 
-	    if (stricmp(option, "source") == 0 && i+1 < argc) {
+      if (stricmp(option, "source") == 0 && i+1 < argc) {
         source_file_path = argv[++i];
         source_file_path_len = strlen(source_file_path);
         if (source_file_path[source_file_path_len] == FILE_SEP) {
@@ -863,8 +863,8 @@ int main(int argc, char* argv[])
         }
         source_path_redefined = true;
         continue;
-	    } 
-	    if (stricmp(option, "history") == 0 && i+1 < argc) {
+      } 
+      if (stricmp(option, "history") == 0 && i+1 < argc) {
         history = fopen(argv[++i], "a+");
         if (history != NULL) { 
           char his_buf[MAX_MSG_LENGTH];
@@ -882,15 +882,15 @@ int main(int argc, char* argv[])
                   argv[i]);
         }
         continue;
-	    }
-	    if (stricmp(option, "max_shown_paths") == 0 && i+1 < argc) {
+      }
+      if (stricmp(option, "max_shown_paths") == 0 && i+1 < argc) {
         if (sscanf(argv[++i], "%d", &max_shown_paths) != 1) { 
           fprintf(stderr, "Bad parameter value for -max_shown_paths "
                   "option: '%s'\n", argv[i]);
         }
         continue;
-	    } 
-	    if (stricmp(option, "verbose") == 0) { 
+      } 
+      if (stricmp(option, "verbose") == 0) { 
         verbose = enabled;
         if (verbose) { 
           fprintf(stderr, 
@@ -898,12 +898,12 @@ int main(int argc, char* argv[])
                   "        version %3.2f ("__DATE__")\n", VERSION);  
         }
         continue;
-	    }
-	    if (stricmp(option, "help") == 0) { 
+      }
+      if (stricmp(option, "help") == 0) { 
         usage();
         return EXIT_SUCCESS;
-	    }
-	    for (j = 0; j < n_cat; j++) { 
+      }
+      for (j = 0; j < n_cat; j++) { 
         if (stricmp(msg[j].cat_name, option) == 0) { 
           if (enabled) { 
             reported_message_mask |= msg[j].msg_cat;
@@ -912,8 +912,8 @@ int main(int argc, char* argv[])
           }
           break;
         }
-	    }
-	    if (j == n_cat) { 
+      }
+      if (j == n_cat) { 
         for (j = 0; j < msg_last; j++) { 
           if (stricmp(msg_table[j].name, option) == 0) { 
             msg_table[j].enabled = enabled;
@@ -925,20 +925,20 @@ int main(int argc, char* argv[])
           usage();
         }
         return EXIT_FAILURE;
-	    }		 
+      }		 
     } else { 
-	    char* file_name = argv[i];
-	    if (!source_path_redefined) { 
+      char* file_name = argv[i];
+      if (!source_path_redefined) { 
         source_file_path = file_name;
         char* dirend = strrchr(source_file_path, FILE_SEP);
         source_file_path_len = (dirend != NULL)
           ? dirend - source_file_path : 0; 
-	    }
-	    proceed_file(file_name);
+      }
+      proceed_file(file_name);
     }
   }
   class_desc::global_analysis();
   message_at(msg_done, utf_string(""), 0, (void*)n_messages);
   return EXIT_SUCCESS;
-}	
+}  
 

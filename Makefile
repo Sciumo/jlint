@@ -14,6 +14,7 @@ CPP=g++
 CFLAGS = -c -Wall -O0 -g -DHASH_TABLE -DDUMP_EDGES -DDUMP_BYTE_CODES -DPRINT_PC -DDUMP_MONITOR -DDEBUG
 
 # Optimized version
+
 #CFLAGS = -c -Wall -O2 -g -DHASH_TABLE
 
 # Optimized version with switched off asserts

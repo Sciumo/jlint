@@ -23,6 +23,7 @@ MSG(race_condition,concurrent_call,0,"Method %2m can be called from different th
 MSG(race_condition,concurrent_access,0,"Field '%2u' of class '%3c' can be accessed from different threads and is not volatile")
 MSG(race_condition,run_nosync,0,"Method %2m implementing 'Runnable' interface is not synchronized")
 MSG(wait_nosync,wait_nosync,0,"Method %2u is called from non-synchronized method")
+MSG(wait_nosync,wait_nosync_block,0,"Method '%2s.%3u' is called without synchronizing on '%2s'")
 
 //
 // Inheritance

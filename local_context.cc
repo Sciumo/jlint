@@ -19,7 +19,7 @@ vbm_operand* ctx_push_var::transfer(method_desc* method, vbm_operand* sp,
       var[0].mask = 0xffffffff;
       var[1].min  = 0;
       var[1].max  = 0xffffffff;
-      var[1].mask = 0xffffffff;	    
+      var[1].mask = 0xffffffff;      
     } else { 
       var->mask = (var->type == tp_self) 
         ? var_desc::vs_not_null : var_desc::vs_unknown;

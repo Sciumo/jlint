@@ -18,17 +18,17 @@ void graph_vertex::verify()
     
   for (graph_vertex* root = graph; root != NULL; root = root->next) { 
     if (root->marker <= marker || root->visited >= max_shown_paths) { 
-	    continue;
+      continue;
     }
     int sp = 0;
     int i;
-	
+  
     graph_edge* edge = root->edges; 
     root->visited |= flag_vertex_on_path;
     root->marker = ++marker;
 
     while (edge != NULL) { 
-	    while (edge->vertex->marker >= marker || 
+      while (edge->vertex->marker >= marker || 
              edge->vertex->visited < max_shown_paths) 
         {
           graph_vertex* vertex = edge->vertex;
@@ -61,7 +61,7 @@ void graph_vertex::verify()
           break;
         } // end of depth-first loop
 
-	    while (edge->next == NULL) { 
+      while (edge->next == NULL) { 
         if (--sp < 0) break;
         edge = stack[sp];
         edge->vertex->visited &= ~flag_vertex_on_path;
@@ -70,8 +70,8 @@ void graph_vertex::verify()
           // visits of this vertex
           edge->vertex->marker = 0;
         }
-	    }
-	    edge = edge->next;
+      }
+      edge = edge->next;
     }
     root->visited &= ~flag_vertex_on_path;
   }
