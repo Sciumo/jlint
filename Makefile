@@ -10,12 +10,13 @@ CPP=g++
 # remove -DHASH_TABLE for really old systems without SGI's hash implementations
 
 # Debug version
-CFLAGS = -c -Wall -O0 -g -DSLIST -DHASH_TABLE -DDUMP_MONITOR -DDEBUG -DDUMP_EDGES
+#CFLAGS = -c -Wall -O0 -g -DSLIST -DHASH_TABLE -DDEBUG
+#CFLAGS = -c -Wall -O0 -g -DSLIST -DDUMP_MONITOR -DDUMP_EDGES -DDUMP_STACK -DDUMP_BYTE_CODES
 #CFLAGS = -c -Wall -O0 -g -DSLIST -DHASH_TABLE -DDUMP_EDGES -DDUMP_BYTE_CODES -DPRINT_PC -DDUMP_STACK -DDUMP_MONITOR -DDEBUG
 
 # Optimized version
 
-#CFLAGS = -c -Wall -O2 -g -DSLIST -DHASH_TABLE
+CFLAGS = -c -Wall -O2 -g -DSLIST -DHASH_TABLE
 
 # Optimized version with switched off asserts
 #CFLAGS = -c -Wall -O2 -g -DSLIST -DNDEBUG -DHASH_TABLE
