@@ -5,7 +5,7 @@ Jlint will check your Java code and find bugs, inconsistencies and
 synchronization problems by doing data flow analysis and building a lock graph.
 
 Original version (1.11) by Konstantin Knizhnik.
-Enhanced version (1.2) and a few bugfixes by Cyrille Artho.
+Enhanced version (2.0) and a few bugfixes by Cyrille Artho.
 
 User guide is found in readme.html.
 
@@ -25,6 +25,6 @@ If Jlint won't compile for your system, remove the flags -DHASH_TABLE and
 -DSLIST in the Makefile, or upgrade to a newer version of the STL.
 
 Developer info: you can update the Makefile by typing
-./mkmf.pl jlint antic <Makefile >__tmp__ ; mv __tmp__ Makefile
+./mkmf.pl jlint antic readme <Makefile >__tmp__ ; mv __tmp__ Makefile
 
 Send bug reports to cyrille@artho.com, Subject: Jlint.

@@ -42,7 +42,7 @@ clean:
 doc: readme.texi
 	texi2html -monolithic readme.texi; texi2pdf readme.texi
 
-dist: targz
+dist: doc targz
 
 targz:
 	cd ..; tar -cvzf jlint.tar.gz jlint/antic.c jlint/BUGS jlint/Makefile jlint/*.msg jlint/*.hh jlint/*.cc jlint/*.d jlint/README jlint/TODO jlint/CHANGELOG jlint/COPYING jlint/readme.texi jlint/readme.html jlint/readme.pdf jlint/jlint.sh jlint/mkmf.pl; cd jlint
@@ -63,9 +63,8 @@ jlint: \
 	local_context.o \
 	locks.o \
 	message_node.o \
-	method_desc.o \
-	readme.o
-	$(CPP) $(LFLAGS) -o jlint access_desc.o callee_desc.o class_desc.o graph.o jlint.o local_context.o locks.o message_node.o method_desc.o readme.o
+	method_desc.o
+	$(CPP) $(LFLAGS) -o jlint access_desc.o callee_desc.o class_desc.o graph.o jlint.o local_context.o locks.o message_node.o method_desc.o
 
 access_desc.o: access_desc.cc \
 	access_desc.hh \
@@ -248,8 +247,5 @@ method_desc.o: method_desc.cc \
 	graph.hh \
 	overridden_method.hh
 	$(CPP) $(CFLAGS) method_desc.cc
-
-readme.o: readme.cp
-	$(CPP) $(CFLAGS) readme.cp
 
 # --> end of automatically generated dependencies; do not remove this line.
