@@ -27,7 +27,7 @@
 @end direntry
 
 @titlepage
-@title Jlint
+@title Jlint manual
 @subtitle Java program checker
 @author Konstantin Knizhnik, Cyrille Artho
      

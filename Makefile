@@ -37,15 +37,15 @@ antic: antic.o
 	$(CC) $(LFLAGS) -o antic antic.o
 
 clean: 
-	rm -f  *.o *.exe core *~ *.his *.class jlint antic readme.html readme.pdf
+	rm -f  *.o *.exe core *~ *.his *.class jlint antic manual.html manual.pdf
 
-doc: readme.texi
-	texi2html -monolithic readme.texi; texi2pdf readme.texi
+doc: manual.texi
+	texi2html -monolithic manual.texi; texi2pdf manual.texi
 
 dist: doc targz
 
 targz:
-	cd ..; tar -cvzf jlint.tar.gz jlint/antic.c jlint/BUGS jlint/Makefile jlint/*.msg jlint/*.hh jlint/*.cc jlint/*.d jlint/README jlint/TODO jlint/CHANGELOG jlint/COPYING jlint/readme.texi jlint/readme.html jlint/readme.pdf jlint/jlint.sh jlint/mkmf.pl; cd jlint
+	cd ..; tar -cvzf jlint.tar.gz jlint/antic.c jlint/BUGS jlint/Makefile jlint/*.msg jlint/*.hh jlint/*.cc jlint/*.d jlint/README jlint/TODO jlint/CHANGELOG jlint/COPYING jlint/manual.texi jlint/manual.html jlint/manual.pdf jlint/jlint.sh jlint/mkmf.pl; cd jlint
 
 install:
 	cp jlint antic jlint.sh $(INSTALL_DIR)
