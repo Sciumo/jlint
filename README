@@ -16,13 +16,13 @@ User guide is found in readme.html.
 
 Installation:
 ------------
-System requirements:
+- System requirements:
 For compiling:	C++ compiler, C++ Standard Library with Standard Templates.
 For compiling the docs: Texinfo; type "make doc".
 For using:	Any Java compiler (no Java Run Time Environment needed).
 Recommended:	A Unix shell (e. g. bash) to run jlint.sh.
 
-Installation:
+- Installation:
 1. Unpack the archive with unzip jlint.zip (MS-DOS) or
    gunzip -c jlint.tar.gz | tar -xvf -
 2. cd jlint
@@ -32,6 +32,8 @@ Compilation problems:
 ---------------------
 If Jlint won't compile for your system, remove the flags -DHASH_TABLE and
 -DSLIST in the Makefile, or upgrade to a newer version of the STL.
+
+- Egcs users:
 
 People with an old compiler (e.g., egcs 2.91 on RedHat GNU/Linux 6.x)
 should comment out two lines (thanks to Eric A. Raymond for this patch):
@@ -45,7 +47,14 @@ message_node.cc
 3  // Commented out extern by EAR to compile on Linux
 4  /* extern */ message_node* message_node::hash_table[1023];
 
-Developer info: you can update the Makefile by typing
+- Windows users:
+
+To have .cc files be recognized as C++ source code, check out
+http://support.microsoft.com/support/kb/articles/Q181/5/06.ASP
+
+- Creating a new Makefile:
+
+You can update the Makefile by typing
 ./mkmf.pl jlint antic readme <Makefile >__tmp__ ; mv __tmp__ Makefile
 
 Bugs:
