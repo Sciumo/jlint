@@ -195,7 +195,7 @@ char const* const vbm_instruction_mnemonic[] = {
 
 #define LOAD_INT8(src,field)      TO_INT8((src)[0].field, (src)[1].field)
 #define STORE_INT8(dst,field,src) (dst)[0].field = HIGH_PART(src),\
-				  (dst)[1].field = LOW_PART(src) 
+          (dst)[1].field = LOW_PART(src) 
 
 #define INT8_MAX      ((int8)((nat8)-1 >> 1))
 #define INT8_MIN      ((int8)(((nat8)-1 >> 1) + 1))

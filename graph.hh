@@ -37,7 +37,7 @@ public:
     flag_vertex_on_path    = 0x80000000,
     flag_vertex_not_marked = 0x7fffffff
   };
-	
+
   static int n_vertexes;
 
   static graph_vertex* graph;

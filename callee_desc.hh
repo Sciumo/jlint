@@ -26,7 +26,7 @@ class callee_desc {
     
 
   void message(int msg_code, ...); 
-	
+  
   callee_desc(class_desc* cls, method_desc* mth, callee_desc* chain, 
               int lineno, int call_attr) 
     { 

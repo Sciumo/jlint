@@ -23,7 +23,7 @@ public:
   int            attr; 
   enum class_attrs { 
     cl_interface = 0x00200,
-    cl_system    = 0x10000	    
+    cl_system    = 0x10000      
   };
 
   int            n_bases;

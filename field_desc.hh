@@ -13,7 +13,7 @@ public:
     f_static     = 0x0008, 
     f_final      = 0x0010,
     f_volatile   = 0x0040, 
-	
+
     f_used       = 0x10000,
     f_serialized = 0x20000 // field is accessed only from methods 
     // of related classes

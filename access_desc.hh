@@ -30,7 +30,7 @@ class access_desc {
       self_class = cls;
       line = lineno;
       attr = 0;
-    }	
+    }
 };
 
 #endif

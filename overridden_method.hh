@@ -9,8 +9,8 @@ class overridden_method {
     method_desc*       method;
 
     overridden_method(method_desc* mth, overridden_method* chain) { 
-	method = mth;
-	next = chain;
+      method = mth;
+      next = chain;
     }
 };
 

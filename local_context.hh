@@ -26,7 +26,7 @@ public:
   local_context(context_cmd ctx_cmd, local_context** chain) { 
     cmd = ctx_cmd;
     while (*chain != NULL && (*chain)->cmd < ctx_cmd) { 
-	    chain = &(*chain)->next;
+      chain = &(*chain)->next;
     }
     next = *chain;
     *chain = this;
@@ -111,7 +111,7 @@ public:
     var_index = index;
     var_start_pc = start_pc;
   }
-	
+    
 
   virtual vbm_operand* transfer(method_desc* method, vbm_operand* sp, 
                                 byte cop, byte& prev_cop);
