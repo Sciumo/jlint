@@ -3,13 +3,6 @@
 
 bool Locks::acquire(Lock lock) { // acquire lock Lock (add to lockset)
   // return true if lock is new
-#ifdef DUMP_MONITOR
-  printf("Acquiring lock %s.%s (%x) in %x.\n", 
-         lock->cls->name.as_asciz(),
-         lock->name.as_asciz(),
-         (int)lock,
-         (int)this);
-#endif
   monitor_table::iterator entry = monTable.find(lock);
   if (entry == monTable.end()) { // new lock, insert
     monTable.insert(monitor_table::value_type(lock, 1));

@@ -2,7 +2,6 @@
 #define FIELD_DESC_HH
 
 #include "component_desc.hh"
-#include "class_desc.hh"
 #include "utf_string.hh"
 class const_name_and_type;
 

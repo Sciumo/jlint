@@ -1,7 +1,7 @@
 #include "class_desc.hh"
 
 class_desc::class_desc(utf_string const& str) 
-  : name(str), source_file(str+".java") 
+  : name(str), source_file(str+".java", true) 
 { 
   fields = NULL;
   methods = NULL;
@@ -11,15 +11,6 @@ class_desc::class_desc(utf_string const& str)
   metaclass_vertex = new graph_vertex(this);
   next = chain;
   chain = this;
-
-  if (FILE_SEP != '/') { 
-    // Produce valid operationg system dependent file name
-    for (char* p = source_file.as_asciz(); *p != '\0'; p++) { 
-      if (*p == '/') { 
-        *p = FILE_SEP;
-      } 
-    }
-  }
 }
 
 class_desc* class_desc::get(utf_string const& str)

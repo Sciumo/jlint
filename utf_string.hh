@@ -68,7 +68,7 @@ class utf_string {
 
   void set_size(int size) { len = size; }
 
-  char* as_asciz() const { return (char*)data; }
+  const char* as_asciz() const { return (const char*)data; }
 
   utf_string(int length, byte* str) { 
     len = length;
@@ -85,6 +85,21 @@ class utf_string {
     len = str.len;
     data = str.data;
   }
+
+  utf_string(utf_string const& str, bool foo) {
+    len = str.len;
+    data = str.data;
+    
+    if (FILE_SEP != '/') { 
+      // Produce valid operationg system dependent file name
+      for (char* p = (char *) data; *p != '\0'; p++) { 
+        if (*p == '/') { 
+          *p = FILE_SEP;
+        } 
+      }
+    }
+  }
+
   utf_string() { len = 0; data = NULL; }
 };
 

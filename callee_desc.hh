@@ -15,6 +15,7 @@ class callee_desc {
   class_desc*    self_class;
   method_desc*   method;
   callee_desc*   next;
+
   void*          backtrace;
   int            line;
   int            attr;
@@ -23,7 +24,6 @@ class callee_desc {
     i_synchronized  = 0x02, // method is invoked from synchronized(){} body
     i_wait_deadlock = 0x04  // invocation can cause deadlock in wait()
   };
-    
 
   void message(int msg_code, ...); 
   
@@ -35,7 +35,7 @@ class callee_desc {
       next = chain;
       line = lineno;
       attr = call_attr;
-      backtrace = NULL; 
+      backtrace = NULL;
     }
 };
 

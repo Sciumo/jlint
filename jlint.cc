@@ -70,7 +70,7 @@ void message_at(int code, utf_string const& file, int line, ...)
 
 int get_number_of_parameters(utf_string const& str)
 {
-  char* p = str.as_asciz();
+  const char* p = str.as_asciz();
   assert(*p++ =='(');
   int n_params = 0;
   while (*p != ')') { 
@@ -98,7 +98,7 @@ int get_number_of_parameters(utf_string const& str)
 
 int get_type(utf_string const& str) 
 { 
-  char* p = str.as_asciz();
+  const char* p = str.as_asciz();
   if (*p == '(') { 
     while (*++p != ')'); 
     p += 1;
@@ -134,7 +134,7 @@ void format_message(int code, utf_string const& file, int line, va_list ap)
   static int loop_id;
   static message_node *first, *last;
   static char* compound_message;
-  void* parameter[MAX_MSG_PARAMETERS];
+  const void* parameter[MAX_MSG_PARAMETERS];
   int   n_parameters = 2;
   
   if (code == msg_loop || code == msg_sync_loop) { // extract loop identifier
@@ -288,7 +288,7 @@ int class_desc::n_classes;
 void set_class_source_path(class_desc* cls)
 {
   if (source_file_path_len != 0) { 
-    char* class_file_name = cls->source_file.as_asciz();
+    const char* class_file_name = cls->source_file.as_asciz();
     if (!source_path_redefined) { 
       char* dirend = strrchr(class_file_name, '/');
       if (dirend != NULL) { 
@@ -386,7 +386,7 @@ bool parse_class_file(byte* fp)
   set_class_source_path(this_class);
 
   // init. is_this
-  field_desc* is_this = new field_desc(utf_string("<this>"), NULL, NULL);
+  field_desc* is_this = new field_desc(utf_string("<this>"), this_class, NULL);
   // assign name_and_type for is_this - find name entry "this" and obj. type
   is_this->name_and_type =
     new const_name_and_type(name_index,
@@ -495,7 +495,7 @@ bool parse_class_file(byte* fp)
         fp += code_length;
 
         method->n_vars = max_locals;
-        method->vars = new var_desc[max_locals];
+        method->vars = max_locals > 0 ? new var_desc[max_locals] : NULL;
 
         method->line_table = new word[code_length];
         memset(method->line_table, 0, sizeof(word)*code_length);
@@ -574,9 +574,13 @@ bool parse_class_file(byte* fp)
       }
     }
   }
-  for (i = 0; i < constant_pool_count; i++) { 
-    delete constant_pool[i];
+
+  for (i = 1; i < constant_pool_count; i++) {
+    if (constant_pool[i] != NULL)
+      delete constant_pool[i];
   }
+
+
   delete[] constant_pool;
   delete is_this->name_and_type;
   delete is_this;

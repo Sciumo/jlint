@@ -7,9 +7,38 @@ void graph_edge::message(int loop_id)
     invocation->method->cls = vertex->cls;
     if (!strcmp(invocation->method->name.as_asciz(), "<synch>")) {
       // special error message about synchronized blocks
-      invocation->message(msg_lock, invocation->self_class->name.as_asciz(), caller->cls->name.as_asciz());
+      if (invocation->method->attr & method_desc::m_sync_block) {
+        const char* lock1 = invocation->self_class->name.as_asciz();
+        // pretty print lock set
+        string lockset = "";
+        monitor_stack::const_iterator entry = caller->locksAtEntry.begin();
+        while (entry != caller->locksAtEntry.end()) {
+          if ((*entry)->cls == NULL)
+            break;
+          const char* full_name =
+            compound_name((*entry)->cls->name.as_asciz(),
+                          (*entry)->name.as_asciz());
+          if (strcmp(full_name, lock1)) {
+            lockset += string(", ");
+            lockset += full_name;
+          }
+          entry++;
+        }
+        if (caller->locksAtEntry.nLocks() > 2) {
+          lockset += "}";
+          lockset.replace(0, 2, "set {");
+        } else {
+          lockset.replace(0, 2, "");
+        }
+        invocation->message(msg_lock, lock1, lockset.c_str());
+      } else {
+        invocation->message(msg_lock, invocation->self_class->name.as_asciz(), 
+                            caller->cls->name.as_asciz());
+      }
     } else {
-      invocation->message(msg_sync_loop, (void*)loop_id, invocation->method);
+      if (!(invocation->method->attr & method_desc::m_sync_block)) {
+        invocation->message(msg_sync_loop, (void*)loop_id, invocation->method);
+      }
     }
     invocation->method->cls = abstract_class;
     mask |= (1 << (loop_id & 31));

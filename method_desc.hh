@@ -18,6 +18,7 @@ class callee_desc;
 #include "functions.hh"
 #include "access_desc.hh"
 #include "string_pool.hh"
+#include "locks.hh"
 class local_context;
 
 class method_desc : public component_desc {
@@ -41,7 +42,10 @@ public:
     // or synchronized or called from them.
     m_visited      = 0x080000, // Used while recursive traversal of methods
     m_deadlock_free= 0x100000, // Doesn't call any synchronized methods
-    m_override     = 0x200000  // Override method of base class
+    m_override     = 0x200000, // Override method of base class
+
+    m_sync_block   = 0x400000 
+    // is called from another method, within a synchronized block
   };
 
   int            n_vars;
@@ -80,6 +84,8 @@ public:
   int            first_line; // line corresponing to first method instruction
   int            wait_line;  // line of last wait() invocation in the method
   word*          line_table;
+
+  Locks locksAtEntry; // locks (potentially) held when method is called
 
   int  demangle_method_name(char* buf);
 
@@ -126,14 +132,19 @@ public:
       overridden = NULL;
       local_variable_table_present = false;
       null_parameter_mask = unchecked_use_mask = 0;
+      new_cnt = 0;
+      // equal_descs.insert(equal_descs.begin(), NULL);
     }
 
 private:
-  typedef vector<field_desc*> Tequal_descs; // field_descs for "equal" field
-  Tequal_descs equal_descs; // field_descs for "equal" field
+  int new_cnt;
+  // typedef vector<field_desc*> Tequal_descs; // field_descs for "equal" field
+  // Tequal_descs equal_descs; // field_descs for "equal" field
   field_desc* getNew(); // returns new field desc* and increments counter
+  // returns "first.second", as a string allocated in the string pool
 };
 
+const char* compound_name(const char* first, const char* second);
 extern string_pool stringPool; // declared in jlint.cc
 extern field_desc* is_const;
 #endif

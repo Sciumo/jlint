@@ -12,7 +12,7 @@ void print_call_sequence(callee_desc* callee, int loop_id, int path_id)
 int method_desc::demangle_method_name(char* buf)
 {
   char* dst = buf;
-  char* src = desc.as_asciz();
+  const char* src = desc.as_asciz();
   assert(*src++ == '(');
   dst += sprintf(dst, "%s.%s(", cls->name.as_asciz(), name.as_asciz());
   int first_parameter = true;
@@ -90,7 +90,7 @@ bool method_desc::build_call_graph(method_desc* caller, callee_desc* callee,
   for (overridden_method* ovr = overridden; ovr != NULL; ovr = ovr->next) { 
     ovr->method->build_call_graph(caller, callee, caller_attr);
   }
-  if (attr & m_synchronized) { 
+  if ((attr & m_synchronized) || (attr & m_sync_block)) { 
     if (!(caller_attr & callee_desc::i_self)) {
 #ifdef DUMP_EDGES
       char buf[2][MAX_MSG_LENGTH];
@@ -99,6 +99,7 @@ bool method_desc::build_call_graph(method_desc* caller, callee_desc* callee,
       printf("Call graph edge %s -> %s\n", buf[0], buf[1]);
 #endif
       graph_edge* edge = new graph_edge(vertex, caller, callee);
+      assert(caller->vertex != NULL);
       caller->vertex->attach(edge);
     }
     return true;
@@ -128,7 +129,8 @@ void method_desc::check_synchronization()
         if (!(callee->method->attr & (m_serialized|m_synchronized)) &&
             !(callee->method->cls->attr & class_desc::cl_system) &&
             !(callee->attr & (callee_desc::i_self
-                              |callee_desc::i_synchronized)))
+                              |callee_desc::i_synchronized)) &&
+            (strstr(callee->method->name.as_asciz(), "init>") == NULL) )
           {
             callee->message(msg_concurrent_call, callee->method);
           }
@@ -449,7 +451,7 @@ void method_desc::basic_blocks_analysis()
   byte* pc = code;
   byte* end = pc + code_length;
   int   i;
-  var_store_count = new int[n_vars];
+  var_store_count = n_vars > 0 ? new int[n_vars] : NULL;
 
   for (i = n_vars; --i >= 0;) { 
     vars[i].type = tp_void;
@@ -673,6 +675,10 @@ void method_desc::parse_code(constant** constant_pool,
     vars[0].max = MAX_ARRAY_LENGTH;
     vars[0].equals = is_this;
   }
+  /*if (attr & m_synchronized) { // add "this" to lock set if needed
+    cls->locks.acquire(is_this);
+    }*/
+
   while (pc < end) { 
     int addr = pc - code;
     byte cop = *pc++; 
@@ -2391,7 +2397,8 @@ void method_desc::parse_code(constant** constant_pool,
         if (cop != invokestatic) { 
           fp += 1;
           check_variable_for_null(addr, sp-fp);
-        }  
+        }
+
 #ifdef DUMP_STACK
         printf("<stack_top> = %s\n",
                sp[-fp].equals == NULL ? 
@@ -2407,21 +2414,15 @@ void method_desc::parse_code(constant** constant_pool,
             wait_on = NULL;
           }
           if (mth_name == "notify" 
-              || mth_name == "notify_all" 
+              || mth_name == "notifyAll" 
               || mth_name == "wait") { 
-            if (attr & m_synchronized) { // add "this" to lock set if needed
-              cls->locks.acquire(is_this);
-              if (wait_on == is_this) {
+            // check whether lock on object which is waited on is owned
+            if (wait_on != NULL) {
+              if (cls->locks.owns(wait_on)) {
                 hold_lock = true;
               }
-            }
-            // make sure thread holds only lock it should hold            
-            if (!(attr & m_synchronized)) {
-              // check whether lock on object which is waited on is owned
-              if (wait_on != NULL) {
-                if (cls->locks.owns(wait_on)) {
-                  hold_lock = true;
-                }
+              if ((wait_on == is_this) && (attr & m_synchronized)) {
+                hold_lock = true;
               }
             }
             if (!hold_lock) {
@@ -2436,12 +2437,25 @@ void method_desc::parse_code(constant** constant_pool,
             wait_line = get_line_number(addr);
             attr |= m_wait;
             // check whether other locks are held
-            if (cls->locks.nLocks() - (hold_lock? 1:0) > 0) {
+            int nLocks = cls->locks.nLocks() - (hold_lock? 1:0) > 0;
+            if (!(cls->locks.owns(is_this)) &&
+                (wait_on != is_this) &&
+                (attr & m_synchronized)) {
+              nLocks +=1;
+            }
+            if (nLocks > 0) {
               message(msg_wait, addr);
+              nLocks = cls->locks.nLocks();
               // print all other locks
               char buf[MAX_MSG_LENGTH - 40]; // buffer for locks
               char* out = buf;
               int n;
+              if (!(cls->locks.owns(is_this)) && (attr & m_synchronized)) {
+                out += snprintf(out, sizeof(buf), 
+                                " <this>,");
+                assert((int)out > (int)buf);
+                nLocks++;
+              }
               monitor_stack::const_iterator entry = cls->locks.begin();
               while (entry != cls->locks.end()) {
                 if ((n = snprintf(out, 
@@ -2457,26 +2471,79 @@ void method_desc::parse_code(constant** constant_pool,
                 entry++;
               }
               *(out-1) = '\0';
-              message(msg_locklist, addr, cls->locks.nLocks(), buf);
+              message(msg_locklist, addr, nLocks, buf);
               n_messages--; // avoid counting message twice
             }
           }
         } // end of wait/notify treatment
-        if (cop == invokespecial) { 
-          if (mth_name == "finalize") { 
-            super_finalize = true;
-          }
+        if ((cop == invokespecial) && (mth_name == "finalize")) {
+          super_finalize = true;
         } else { 
           method_desc* method = obj_cls->get_method(mth_name, mth_desc);
           int call_attr = 0;
-          if (cop != invokestatic && sp[-fp].type == tp_self) { 
+          if (cop != invokestatic && sp[-fp].type == tp_self) {
             call_attr |= callee_desc::i_self;
           } 
-          if (in_monitor) { 
+          if ((cls->locks.owns(is_this)) || in_monitor) {
             call_attr |= callee_desc::i_synchronized;
           }
           callees = new callee_desc(cls, method, callees,
                                     get_line_number(addr), call_attr);
+
+          if (cls->locks.nLocks() > 0) {
+            // if locks are currently held...
+            // ... add call from innermost "pseudo method" to method
+            method->attr |= m_concurrent;
+            Lock curr = cls->locks.getInnermost();
+            if (curr == is_this) { 
+              call_attr |= callee_desc::i_self; 
+            }
+            if ((curr->cls == cls) &&
+                (method->cls == cls)) { // ignore calls to other classes
+              const char* curr_name =
+                compound_name(cls->name.as_asciz(), curr->name.as_asciz());
+              class_desc* curr_cls = class_desc::get(utf_string(curr_name));
+              
+              method_desc* caller_method =
+                curr_cls->get_method(utf_string("<synch>"), utf_string("()"));
+              // caller_method->attr |= method_desc::m_synchronized;
+
+              if (caller_method->vertex == NULL) {
+                caller_method->vertex = new graph_vertex(curr_cls);
+              }
+
+              // callee
+              method->attr |= method_desc::m_sync_block;
+              if (method->vertex == NULL) {
+                method->vertex = new graph_vertex(obj_cls);
+              }
+              
+              if (!(method->locksAtEntry.owns(curr))) {
+                /*
+                method->callees =
+                  new callee_desc(obj_cls, method, method->callees,
+                                  get_line_number(addr), call_attr);
+
+                // lock was not in list, add to call graph
+
+                int caller_attr = 0;
+                // caller_attr |= method_desc::m_synchronized;
+                // attr |= m_synchronized; // crucial flag for later analysis?
+                method->build_call_graph(caller_method, method->callees,
+                                         caller_attr);
+                method->locksAtEntry.acquire(curr);
+                // add edge for pseudo method to call graph
+                */
+              }
+            } /* else {
+              fprintf(stderr, "Ignoring call %s.%s -> %s.%s!\n",
+                      curr->cls->name.as_asciz(),
+                      curr->name.as_asciz(),
+                      method->cls->name.as_asciz(),
+                      method->name.as_asciz());
+                      } */
+          } // end of pseudo method -> method call
+
           if (n_params < 32) { 
             int mask = 0;
             for (i = 0; i < n_params; i++) { 
@@ -2599,96 +2666,82 @@ void method_desc::parse_code(constant** constant_pool,
           if (sp->equals->name_and_type != NULL) {
             class_desc* curr_cls;
             
-            // get class descriptor of current innermost lock (a)
-            // instead of normal class descriptor, use TYPE.variable_name
-            // this will allow us to distinguish between instances (imperfectly)
+            method_desc* caller_method;
             if (curr != NULL) {
               // already holding a lock
+              // get class descriptor of current innermost lock (a)
+              // instead of normal class descriptor, use TYPE.variable_name
+              // this will allow us to distinguish between instances (imperfectly)
               /* utf_string* curr_class_type = 
                  dynamic_cast<utf_string*>(constant_pool[curr->name_and_type->desc]); */
               const char* curr_class_name;
-              const char* curr_lock_name = curr->name.as_asciz();
               if (curr->name_and_type->name == 0) {
                 curr_class_name = cls->name.as_asciz();
               } else {
                 curr_class_name = curr->cls->name.as_asciz();
-                  /*                  ((utf_string*)(constant_pool[curr->name_and_type->desc]))->as_asciz();*/
               }
-              char* curr_full_name = 
-                (char *)malloc((size_t)(strlen(curr_class_name) + 
-                                        strlen(curr_lock_name) + 2));
-              /* Add one byte for '.' and for '\0'. */
-              strcpy(curr_full_name, curr_class_name);
-              char* tmp = curr_full_name + strlen(curr_full_name); 
-              // point to \0
-              *tmp = '.';
-              strcpy(++tmp, curr_lock_name);
-              const char* curr_name = stringPool.add(curr_full_name);
-              free(curr_full_name);
+              // use pseudo class name "owner.name" to distinguish between
+              // fields of different objects
+              const char* curr_name =
+                compound_name(curr_class_name, curr->name.as_asciz());
               curr_cls = class_desc::get(utf_string(curr_name));
               
-              method_desc* caller_method = curr_cls->get_method(utf_string("<synch>"), utf_string("()"));
-              /* try the following:
-               * curr_cls = class_desc::get(*curr_class_type)
-               * caller_method = ...(<synch>, owner() 
-               * same below 
-               * this may solve the problem of multiple and false warnings
-               * when analyzing multiple source file with same variable names 
-               * if this does not help, use fully qualified variable name 
-               * including name of package in owner object (plus method
-               * name if it is a local variable)
-               * maybe exact type is needed as well (including desc) */
+              caller_method =
+                curr_cls->get_method(utf_string("<synch>"), utf_string("()"));
               caller_method->attr |= method_desc::m_synchronized;
-              if (caller_method->vertex == NULL) {
-                caller_method->vertex = new graph_vertex(curr_cls);
-              }
-
-              // get class descriptor of object type of new lock (b)
-              const char* class_name = sp->equals->cls->name.as_asciz();
-              const char* lock_name = sp->equals->name.as_asciz();
-
-              char* full_name = 
-                (char *)malloc((size_t)(strlen(class_name) + 
-                                        strlen(lock_name) + 2));
-              /* Add one byte for '.' and for '\0'. */
-              strcpy(full_name, class_name);
-              /* char* */ tmp = full_name + strlen(full_name); // point to \0
-              *tmp = '.';
-              strcpy(++tmp, lock_name);
-              lock_name = stringPool.add(full_name);
-              free(full_name);
-              class_desc* obj_cls = class_desc::get(utf_string(lock_name));
-
-              // add call from a to dummy method b.<synch>
-              method_desc* method = 
-                obj_cls->get_method(utf_string("<synch>"), 
-                                    utf_string("()"));
-              method->attr |= method_desc::m_synchronized;
-              if (method->vertex == NULL) {
-                method->vertex = new graph_vertex(obj_cls);
-              }
-              obj_cls->source_file = cls->source_file;
-              
-              // add call from a.<synch> to b.<synch>
-              int call_attr = 0;
-              call_attr |= callee_desc::i_synchronized;
-              method->callees =
-                new callee_desc(obj_cls, method, method->callees,
-                                get_line_number(addr), call_attr);
-              int caller_attr = 0;
-              caller_attr |= method_desc::m_synchronized;
-
-              method->build_call_graph(caller_method, method->callees,
-                                       caller_attr);
-              //free(full_name);
+            } else { // no lock acquired yet in this method
+              // add call graph edge (this method) -> (lock)
+              // get method descriptor of this method
+              caller_method = this;
+              curr_cls = cls;
             }
+            if (caller_method->vertex == NULL) {
+              caller_method->vertex = new graph_vertex(curr_cls);
+            }
+
+            // get class descriptor of object type of new lock (b)
+            const char* lock_name =
+              compound_name(sp->equals->cls->name.as_asciz(), // class name
+                            sp->equals->name.as_asciz()); // field name
+            class_desc* obj_cls = class_desc::get(utf_string(lock_name));
+
+            // get descriptor of dummy method "owner.b.<synch>"
+            method_desc* method = 
+              obj_cls->get_method(utf_string("<synch>"), 
+                                  utf_string("()"));
+            method->attr |= method_desc::m_synchronized;
+            if (method->vertex == NULL) {
+              method->vertex = new graph_vertex(obj_cls);
+            }
+            obj_cls->source_file = cls->source_file;
+              
+            // add call from a.<synch> to b.<synch>
+            int call_attr = 0;
+            call_attr |= callee_desc::i_synchronized;
+            if (sp->equals->cls == cls) {
+              call_attr |= callee_desc::i_self;
+            } 
+
+            method->callees =
+              new callee_desc(obj_cls, method, method->callees,
+                              get_line_number(addr), call_attr);
+
+            if (caller_method->attr & m_sync_block) {
+              method->attr |= m_sync_block;
+            }
+
+            int caller_attr= 0;
+            caller_attr |= method_desc::m_synchronized;
+
+            method->build_call_graph(caller_method, method->callees,
+                                     caller_attr);
 #ifdef DUMP_MONITOR
-            printf("%s acquires lock on %s.%s (type %s)\n", 
-                   cls->name.as_asciz(),
-                   sp->equals->cls->name.as_asciz(),
-                   sp->equals->name.as_asciz(),
-                   ((const_utf8*)constant_pool[sp->equals->name_and_type->desc])->as_asciz()
-                   );
+          printf("%s acquires lock on %s.%s (type %s)\n", 
+                 cls->name.as_asciz(),
+                 sp->equals->cls->name.as_asciz(),
+                 sp->equals->name.as_asciz(),
+                 ((const_utf8*)constant_pool[sp->equals->name_and_type->desc])->as_asciz()
+                 );
 #endif
           }
         }
@@ -2912,15 +2965,15 @@ void method_desc::parse_code(constant** constant_pool,
   if (name == "finalize" && !super_finalize) { 
     message(msg_super_finalize, 0);
   }
+  
   // cleanup
+  
+  /*
   for (field_desc** fd = equal_descs.begin(); fd != equal_descs.end(); fd++) {
-    /*    if (! strncmp("<new>", (*fd)->name.as_asciz(), 5)) {
-          // free <new> constants which are not in constant pool*/
-      free((*fd)->name.as_asciz());
-      /*}*/
     delete *fd;
   }
   equal_descs.clear();
+  */
 
   for (i = code_length; i >= 0; i--) { 
     local_context* next;
@@ -2937,9 +2990,27 @@ void method_desc::parse_code(constant** constant_pool,
 field_desc* method_desc::getNew() {
   char* name = (char *)malloc((size_t)10);
   strcpy(name, "<new>");
-  assert(equal_descs.size() < 10000); // 4 characters allowed
-  sprintf(name + strlen(name), "%d", equal_descs.size());
-  field_desc* fd = new field_desc(utf_string(name), cls, NULL);
-  equal_descs.insert(equal_descs.begin(), fd);
+  //  assert(equal_descs.size() < 10000); // 4 characters allowed
+  assert(new_cnt < 10000); // 4 characters allowed
+  snprintf(name + strlen(name), 4, "%d", new_cnt++);
+  const char* fd_name = stringPool.add(name);
+  free(name);
+  field_desc* fd = new field_desc(utf_string(fd_name), cls, NULL);
+  // equal_descs.insert(equal_descs.begin(), fd);
   return fd;
+}
+
+const char* compound_name (const char* first, const char* second) {
+  char* result = 
+    (char *)malloc((size_t)(strlen(first) +
+                            strlen(second) + 2));
+  /* Add one byte for '.' and for '\0'. */
+  strcpy(result, first);
+  char* tmp = result + strlen(first);
+  // point to \0
+  *tmp = '.';
+  strcpy(++tmp, second);
+  const char* retval = stringPool.add(result);
+  free(result);
+  return retval;
 }

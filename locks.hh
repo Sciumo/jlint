@@ -37,7 +37,6 @@ typedef hash_map<const Lock, int, hashLock, eqLock> monitor_table;
 #else
 struct ltLock {
   bool operator()(const Lock l1, const Lock l2) const {
-    return (l1 < l2);
     return strcmp(l1->name.as_asciz(), l2->name.as_asciz()) < 0;
   }
 };
