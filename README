@@ -43,6 +43,12 @@ http://support.microsoft.com/support/kb/articles/Q181/5/06.ASP
 You can update the Makefile by typing
 ./mkmf.pl jlint antic readme <Makefile >__tmp__ ; mv __tmp__ Makefile
 
+- Supported platforms:
+
+Jlint is known to work with recent versions of Linux, Solaris, FreeBSD,
+OpenBSD, Windows. There is no user support available, though, as this
+program is not commercial.
+
 Bugs:
 -----
 Send bug reports to cyrille@artho.com, Subject: Jlint.

@@ -1,8 +1,8 @@
 Jlint changelog:
 
-Version 2.2: Applied Eric A. Raymond's compiler compatibility patch. Removed -DHASH_TABLE in the Makefile due to some problems (it can still be enabled if needed).
+Version 2.2: Applied Eric A. Raymond's compiler compatibility patch. Removed -DHASH_TABLE in the Makefile due to some problems (it can still be enabled if needed). OpenBSD port (thanks to Kevin Lo for testing it).
 
-Version 2.1: BSD Port (thanks to Ernst de Haan for giving me access to a FreeBSD box), Visual C++ port (by Maarten Breddels).
+Version 2.1: FreeBSD Port (thanks to Ernst de Haan for giving me access to a FreeBSD box), Visual C++ port (by Maarten Breddels).
 
 Version 2.0: As a part of Cyrille Artho's master thesis, 2 1/2 weeks were spent on cleaning up and extending Jlint as follows:
 	- Jlint has been restructured into several files. All larger classes now are in their own file, while some smaller classes have been grouped by their meaning. This makes Jlint easier to maintain.

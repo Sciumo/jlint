@@ -4,6 +4,7 @@ Known bugs in Jlint
 Priority (1 = highest)	Bug
 1	Control flow (if/while/for/exceptions) does not work (in method_desc::basic_blocks_analysis). Conditionals and jumps (in Bytecode) seem to be ignored. local_context classes are undocumented and therefore hard to use/fix. Result: many spurious warnings in cases where control flow is transferred inside a lock (e. g. with return). However, these warnings are easily verified manually (10 seconds per warning for an experienced user).
 1	Empty output if single message (rather than message categories) are disabled. Current fix with grep -v...
+2	Makefile: Now uses if statements for dist target, is not portable (normal compilation/installation should still work)
 2	In some circumstances, a lot of "Lock x is acquired while holding lock y, with other thread holding lock y and requesting x." warnings are given. Sometimes, the same warning is printed many times. Usually "x" and "y" were the same string (sometimes referring to unnamed local variables). These warnings are sometimes justified, sometimes certainly not. They should also only appear once.
 2	"Method wait() can be invoked with monitor of other object locked." However, no list of locks given; apparently no other monitor is held. Justified warning or bug?
 2	"Method xy can be called from different threads and is not synchronized." is now sometimes issued several times for same method.
