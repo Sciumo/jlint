@@ -536,8 +536,9 @@ vbm_operand* ctx_merge::transfer(method_desc* method, vbm_operand* sp,
         }
       }
       assert(sp == come_from->stack_pointer);
+      
       if (IS_INT_TYPE(come_from->stack_top[1].type)) { 
-        if (sp[-1].min > come_from->stack_top[1].min) { 
+	if (sp[-1].min > come_from->stack_top[1].min) { 
           sp[-1].min = come_from->stack_top[1].min;
         } 
         if (sp[-1].max < come_from->stack_top[1].max) { 
@@ -561,7 +562,13 @@ vbm_operand* ctx_merge::transfer(method_desc* method, vbm_operand* sp,
         mask0 |= mask1;
         STORE_INT8(sp-2, mask, mask0);      
 #endif
-      } else { 
+      } else {
+	//raphy
+	sp[-1].min = 0;
+	sp[-1].max = 0;
+	come_from->stack_top[1].min = 0;
+	come_from->stack_top[1].max = 0;
+	//raphy end
         if (sp[-1].min > come_from->stack_top[1].min) { 
           sp[-1].min = come_from->stack_top[1].min;
         } 

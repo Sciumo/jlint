@@ -508,7 +508,7 @@ bool parse_class_file(byte* fp)
 	/*  add new entry for exception-handles.It is expected
 	** that the handles are ordered. Only one handle for 
 	** every byte code adress. eg: in the following example only 
-	** add two entries at position 16 and 25 . 
+	** add  entries at position 16 and 25 . 
 	** from         to         handle
 	**  2           10           16
 	** 12           14           16
