@@ -41,6 +41,6 @@ Verification completed: 17 reported messages.
 Verification completed: 22 reported messages.
 Verification completed: 0 reported messages.
 Verification completed: 0 reported messages.
+Verification completed: 0 reported messages.
 ./test1/test.java:176: Local variable 't' shadows component of class 'Thread2'.
 Verification completed: 1 reported messages.
-Verification completed: 0 reported messages.

@@ -23,7 +23,7 @@ for FILE in $OUTS
 		echo "############################################################" >> $DIFFFILE
 		echo "diff of $FILE $LOG is: " >> $DIFFFILE
 		echo "############################################################" >> $DIFFFILE
-		`diff -u $FILE $LOG >> $DIFFFILE`
+		`diff $FILE $LOG >> $DIFFFILE`
             fi
         fi
 done  #for
