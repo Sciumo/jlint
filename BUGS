@@ -16,6 +16,9 @@ experienced user).
 1	Empty output if single message (rather than message categories)
 are disabled. Current fix with grep -v...
 
+2	shadowed variables: spurious warnings occur, functions new_field
+and f_forward management from Jlint 1.2 are missing in 2.X.
+
 2	Makefile: Now uses if statements for dist target, is not portable
 (normal compilation/installation should still work)
 
