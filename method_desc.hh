@@ -86,6 +86,7 @@ public:
   word*          line_table;
 
   Locks locksAtEntry; // locks (potentially) held when method is called
+  // needed to avoid double insertion of "lock -> method" into call graph
 
   int  demangle_method_name(char* buf);
 

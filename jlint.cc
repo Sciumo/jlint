@@ -577,7 +577,9 @@ bool parse_class_file(byte* fp)
       delete constant_pool[i];
   }
 
-
+  for (method_desc* m = this_class->methods; m != NULL; m = m->next) {
+    m->locksAtEntry.clear();
+  }
   delete[] constant_pool;
   delete is_this->name_and_type;
   delete is_this;

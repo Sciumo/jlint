@@ -680,6 +680,7 @@ void method_desc::parse_code(constant** constant_pool,
   }
   if (attr & m_synchronized) { // add "this" to lock set if needed
     cls->locks.acquire(is_this);
+    locksAtEntry.acquire(is_this);
   }
 
   while (pc < end) { 
@@ -2424,9 +2425,6 @@ void method_desc::parse_code(constant** constant_pool,
               if (cls->locks.owns(wait_on)) {
                 hold_lock = true;
               }
-              /*if ((wait_on == is_this) && (attr & m_synchronized)) {
-                hold_lock = true;
-                }*/
             }
             if (!hold_lock) {
               message(msg_wait_nosync, addr, 
@@ -2441,25 +2439,12 @@ void method_desc::parse_code(constant** constant_pool,
             attr |= m_wait;
             // check whether other locks are held
             int nLocks = cls->locks.nLocks() - (hold_lock? 1:0) > 0;
-            if (!(cls->locks.owns(is_this)) &&
-                (wait_on != is_this) &&
-                (attr & m_synchronized)) {
-              assert(false);
-              nLocks +=1;
-            }
             if (nLocks > 0) {
               message(msg_wait, addr);
-              nLocks = cls->locks.nLocks();
               // print all other locks
               char buf[MAX_MSG_LENGTH - 40]; // buffer for locks
               char* out = buf;
               int n;
-              if (!(cls->locks.owns(is_this)) && (attr & m_synchronized)) {
-                out += snprintf(out, sizeof(buf), 
-                                " <this>,");
-                assert((int)out > (int)buf);
-                nLocks++;
-              }
               monitor_stack::const_iterator entry = cls->locks.begin();
               while (entry != cls->locks.end()) {
                 if ((n = snprintf(out, 
@@ -2475,7 +2460,7 @@ void method_desc::parse_code(constant** constant_pool,
                 entry++;
               }
               *(out-1) = '\0';
-              message(msg_locklist, addr, nLocks, buf);
+              message(msg_locklist, addr, cls->locks.nLocks(), buf);
               n_messages--; // avoid counting message twice
             }
           }
@@ -2520,9 +2505,12 @@ void method_desc::parse_code(constant** constant_pool,
                 caller_method->vertex = new graph_vertex(curr_cls);
               }
 
-              if (!(method->locksAtEntry.owns(curr)) &&
-                  (sp->equals == is_this) // (method->cls == cls)
+              if ((!(method->locksAtEntry.owns(curr))) &&
+                  (sp[-fp].equals == is_this) // (method->cls == cls)
                   ) {
+                // context at method entry
+                
+                method->locksAtEntry.acquire(curr);
                 // add call graph edge lock.<synch> -> method
                 // only if method is of current class
                 // and not added before
@@ -2544,16 +2532,10 @@ void method_desc::parse_code(constant** constant_pool,
                 // attr |= m_synchronized; // crucial flag for later analysis?
                 method->build_call_graph(caller_method, method->callees,
                                          caller_attr);
-                method->locksAtEntry.acquire(curr);
+
                 // add edge for pseudo method to call graph
               }
-            } /* else {
-              fprintf(stderr, "Ignoring call %s.%s -> %s.%s!\n",
-                      curr->cls->name.as_asciz(),
-                      curr->name.as_asciz(),
-                      method->cls->name.as_asciz(),
-                      method->name.as_asciz());
-                      } */
+            }
           } // end of pseudo method -> method call
 
           if (n_params < 32) { 
