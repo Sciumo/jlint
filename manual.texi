@@ -48,6 +48,8 @@ MA 02111-1307, USA.
 
 @contents
 
+@node Jlint, , ,
+
 @top jlint
 
 This document described Jlint, a Java program checker that will check your Java code and find bugs, inconsistencies and synchronization problems by doing data flow analysis and building a lock graph.
