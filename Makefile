@@ -6,10 +6,6 @@
 CC=gcc
 CPP=g++
 
-# mit gxx 3.2
-#CC=gcc-3.2
-#CPP=g++-3.2
-
 # Hints:
 # if you use egcs-2.90.* version of GCC please add option -fno-exceptions 
 # to reduce code size and increase performance
