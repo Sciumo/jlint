@@ -1,6 +1,13 @@
 #ifndef STRING_POOL_HH
 #define STRING_POOL_HH
 
+#ifdef __GNUC__
+#if __GNUC__ > 2
+using namespace std;
+#endif
+#endif
+
+
 /******************************************************************************/
 /* Class that allocates a const char* if not yet present in string pool       */
 /******************************************************************************/

@@ -1,6 +1,12 @@
 #ifndef LOCKS_HH
 #define LOCKS_HH
 
+#ifdef __GNUC__
+#if __GNUC__ > 2
+using namespace std;
+#endif
+#endif
+
 /******************************************************************************/
 /* Class that handles the locks that each thread is holding.                  */
 /******************************************************************************/

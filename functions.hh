@@ -35,6 +35,17 @@ class utf_string;
 #define __VALIST va_list
 #endif
 
+// Fix for g++3.2, not needed for g++3.0 or lower. g++3.1?? 
+#ifdef __GNUC__
+#if __GNUC__ > 2
+#ifdef __GNUC_MINOR__
+#if __GNUC_MINOR__ > 0
+#define __VALIST va_list
+#endif
+#endif
+#endif
+#endif
+
 // Fix for cygwin (and possible others), if va_list typedef'd or undefined
 #ifndef __VALIST
 #define __VALIST void*

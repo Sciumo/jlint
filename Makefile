@@ -3,8 +3,13 @@
 # Makefile for Unix and GNU/Linux with gcc/g++ compiler
 # Edit here:
 
-CC=gcc
-CPP=g++
+#mit default gxx
+#CC=gcc
+#CPP=g++
+
+# mit gxx 3.2
+CC=gcc-3.2
+CPP=g++-3.2
 
 # Hints:
 # if you use egcs-2.90.* version of GCC please add option -fno-exceptions 
@@ -18,7 +23,8 @@ CPP=g++
 
 # Optimized version
 
-CFLAGS = -c -Wall -O2 -g -DSLIST
+CFLAGS = -c -Wall -O2 -g
+# -DSLIST removed because it wouldn't compile under gcc 3.x
 # add -DHASH_TABLE for extra speed (may sometimes produce inconsistent results)
 
 # Optimized version with switched off asserts
