@@ -4,11 +4,13 @@ Jlint 2.2 README
 Description:
 ------------
 Jlint will check your Java code and find bugs, inconsistencies and
-synchronization problems by doing data flow analysis and building a lock graph.
+synchronization problems by doing data flow analysis and building a
+lock graph.
 
-Original version (1.11) by Konstantin Knizhnik.
-Enhanced version (2.0) and a few bugfixes by Cyrille Artho.
-Versions 2.1 and newer: FreeBSD port by Cyrille Artho; Visual C++ port by Maarten Breddels; compatibility patch for older compilers by Eric A. Raymond; OpenBSD patch by Kevin Lo.
+Original version (1.11) by Konstantin Knizhnik.  Enhanced version (2.0)
+and a few bugfixes by Cyrille Artho.  Versions 2.1 and newer: FreeBSD
+port by Cyrille Artho; Visual C++ port by Maarten Breddels; compatibility
+patch for older compilers by Eric A. Raymond; OpenBSD patch by Kevin Lo.
 
 Usage:
 ------
