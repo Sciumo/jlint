@@ -51,6 +51,8 @@ install:
 
 
 
+
+
 # --> automatically generated dependencies follow; do not remove this line.
 jlint: \
 	jlint.o \
@@ -60,8 +62,9 @@ jlint: \
 	graph.o \
 	class_desc.o \
 	callee_desc.o \
-	local_context.o
-	$(CPP) $(LFLAGS) -o jlint jlint.o access_desc.o message_node.o method_desc.o graph.o class_desc.o callee_desc.o local_context.o
+	local_context.o \
+	locks.o
+	$(CPP) $(LFLAGS) -o jlint jlint.o access_desc.o message_node.o method_desc.o graph.o class_desc.o callee_desc.o local_context.o locks.o
 
 jlint.o: jlint.cc \
 	jlint.hh \
@@ -80,10 +83,10 @@ jlint.o: jlint.cc \
 	var_desc.hh \
 	local_context.hh \
 	overridden_method.hh \
+	string_pool.hh \
 	jlint.d \
 	functions.hh \
 	inlines.hh \
-	string_pool.hh \
 	locks.hh
 	$(CPP) $(CFLAGS) jlint.cc
 
@@ -132,11 +135,11 @@ method_desc.o: method_desc.cc \
 	functions.hh \
 	access_desc.hh \
 	string_pool.hh \
+	locks.hh \
 	jlint.d \
 	jlint.msg \
 	utf_string.hh \
 	message_node.hh \
-	locks.hh \
 	graph.hh \
 	overridden_method.hh
 	$(CPP) $(CFLAGS) method_desc.cc
@@ -158,9 +161,9 @@ graph.o: graph.cc \
 	functions.hh \
 	access_desc.hh \
 	string_pool.hh \
+	locks.hh \
 	utf_string.hh \
 	message_node.hh \
-	locks.hh \
 	overridden_method.hh
 	$(CPP) $(CFLAGS) graph.cc
 
@@ -232,5 +235,17 @@ local_context.o: local_context.cc \
 	graph.hh \
 	overridden_method.hh
 	$(CPP) $(CFLAGS) local_context.cc
+
+locks.o: locks.cc \
+	locks.hh \
+	types.hh \
+	field_desc.hh \
+	jlint.d \
+	jlint.msg \
+	component_desc.hh \
+	utf_string.hh \
+	functions.hh \
+	message_node.hh
+	$(CPP) $(CFLAGS) locks.cc
 
 # --> end of automatically generated dependencies; do not remove this line.
