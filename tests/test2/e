@@ -1,0 +1,1 @@
+jlint: local_context.cc:529: virtual vbm_operand* ctx_merge::transfer(method_desc*, vbm_operand*, unsigned char, byte&): Assertion `sp == come_from->stack_pointer' failed.

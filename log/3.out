@@ -1,0 +1,58 @@
+Verification completed: 0 reported messages.
+Verification completed: 0 reported messages.
+Verification completed: 0 reported messages.
+Verification completed: 0 reported messages.
+./tests/test3/java/io/BufferedWriter.java:124: Method java/io/Writer.write(java.lang.String) is not overridden by method with the same name of derived class 'java/io/BufferedWriter'.
+Verification completed: 1 reported messages.
+Verification completed: 0 reported messages.
+./tests/test3/java/io/ByteArrayOutputStream.java:126: Loop 1: invocation of synchronized method java/io/ByteArrayOutputStream.write(byte[], int, int) can cause deadlock.
+Verification completed: 1 reported messages.
+Verification completed: 0 reported messages.
+Verification completed: 0 reported messages.
+Verification completed: 0 reported messages.
+Verification completed: 0 reported messages.
+./tests/test3/java/io/DataInputStream.java:270: Zero operand for << operation.
+./tests/test3/java/io/DataInputStream.java:294: Zero operand for << operation.
+./tests/test3/java/io/DataInputStream.java:318: Zero operand for << operation.
+./tests/test3/java/io/DataInputStream.java:344: Zero operand for << operation.
+./tests/test3/java/io/DataInputStream.java:555: Zero operand for << operation.
+Verification completed: 5 reported messages.
+Verification completed: 0 reported messages.
+./tests/test3/java/io/DataOutputStream.java:150: Zero operand for >>> operation.
+./tests/test3/java/io/DataOutputStream.java:166: Zero operand for >>> operation.
+./tests/test3/java/io/DataOutputStream.java:184: Zero operand for >>> operation.
+./tests/test3/java/io/DataOutputStream.java:203: Data can be lost as a result of truncation to int.
+./tests/test3/java/io/DataOutputStream.java:204: Data can be lost as a result of truncation to int.
+./tests/test3/java/io/DataOutputStream.java:205: Data can be lost as a result of truncation to int.
+./tests/test3/java/io/DataOutputStream.java:206: Zero operand for >>> operation.
+./tests/test3/java/io/DataOutputStream.java:282: Zero operand for >>> operation.
+./tests/test3/java/io/DataOutputStream.java:352: Zero operand for >>> operation.
+./tests/test3/java/io/DataOutputStream.java:358: Data can be lost as a result of truncation to byte.
+./tests/test3/java/io/DataOutputStream.java:359: Data can be lost as a result of truncation to byte.
+./tests/test3/java/io/DataOutputStream.java:360: Zero operand for >> operation.
+./tests/test3/java/io/DataOutputStream.java:360: Data can be lost as a result of truncation to byte.
+./tests/test3/java/io/DataOutputStream.java:362: Data can be lost as a result of truncation to byte.
+./tests/test3/java/io/DataOutputStream.java:363: Zero operand for >> operation.
+./tests/test3/java/io/DataOutputStream.java:363: Data can be lost as a result of truncation to byte.
+./tests/test3/java/io/DataOutputStream.java:68: Method java/io/DataOutput.write(byte[]) is not overridden by method with the same name of derived class 'java/io/DataOutputStream'.
+Verification completed: 17 reported messages.
+Verification completed: 0 reported messages.
+Verification completed: 0 reported messages.
+java/lang/String.java:1: equals() was overridden but not hashCode().
+java/io/FileSystem.java:2: hashCode() was overridden but not equals().
+./tests/test3/java/io/File.java:276: Field 'fs' of class 'java/io/File' can be accessed from different threads and is not volatile.
+./tests/test3/java/io/File.java:274: Field 'fs' of class 'java/io/File' can be accessed from different threads and is not volatile.
+./tests/test3/java/io/File.java:270: Field 'fs' of class 'java/io/File' can be accessed from different threads and is not volatile.
+./tests/test3/java/io/File.java:270: Field 'path' of class 'java/io/File' can be accessed from different threads and is not volatile.
+./tests/test3/java/io/File.java:270: Field 'fs' of class 'java/io/File' can be accessed from different threads and is not volatile.
+./tests/test3/java/io/File.java:267: Field 'fs' of class 'java/io/File' can be accessed from different threads and is not volatile.
+./tests/test3/java/io/File.java:267: Field 'fs' of class 'java/io/File' can be accessed from different threads and is not volatile.
+./tests/test3/java/io/File.java:267: Field 'fs' of class 'java/io/File' can be accessed from different threads and is not volatile.
+./tests/test3/java/io/File.java:266: Field 'path' of class 'java/io/File' can be accessed from different threads and is not volatile.
+./tests/test3/java/io/File.java:183: Field 'fs' of class 'java/io/File' can be accessed from different threads and is not volatile.
+./tests/test3/java/io/File.java:182: Field 'fs' of class 'java/io/File' can be accessed from different threads and is not volatile.
+Verification completed: 13 reported messages.
+Verification completed: 0 reported messages.
+Verification completed: 0 reported messages.
+./tests/test3/java/io/FileInputStream.java:245: Method finalize() doesn't call super.finalize().
+Verification completed: 1 reported messages.
