@@ -1,40 +1,141 @@
 \documentclass[11pt,twoside,a4paper,draft]{article}
+\usepackage{verbatim}
 \author{Raphael Ackermann raphy@student.ethz.ch}
 \title{Jlint}
 \begin{document}
 \maketitle
+
+\newpage
+
 \tableofcontents
 
-\section {Jlint}
+\newpage
 
-Jlint is a static model checker for java programs. \newline
-URL: http://www.artho.com/jlint/ \newline
-http://www.sf.org/jlint/ 
+\section {Introduction}
+
+\texttt{jlint} is a static model checker for java programs. \newline
+It can be found on the following URL's: 
+http://www.artho.com/jlint/ \newline
+http://www.sf.org/jlint/ \newline
+
+The development of \texttt{jlint} has been very low in the last two years.
+At the same time a new version of the gnu compiler g++ 3.X and a new java
+version 1.4 became quite popular. Java 1.4 introduced some changes in the way they
+compiled java programs which led jlint to crash/abort/exit when trying to 
+analyze these class files. Furthermore the jlint sources couldn't be build
+using the new g++ 3.x and therefore before it was possible to try to fix this
+bug, the sources had first to be adapted/changed to build again with the 
+current g++ compiler.
+
+There were also a couple of other things wich suggested to revise jlint and
+to do a new major release with an up to date jlint. This meant writing
+the hitherto missing ./configure script, merging some patches, making 
+jlint able to work on 64 bit architectures, and eliminating the warnings
+of valgrind.
+
+Such a long time of almost no development is of course not wanted and
+a broader basis and more active development on jlint was looked for.
+It is hoped that this goal will be reached by moving the CVS-Repositories 
+and the webpage to www.sourceforge.net where everybody can contribute 
+to the further development of jlint.
+While fixing the bug, a test framework was developed which supports
+regression testing on new versions and different platforms.
+Unit Testing could be added in a future release.
+
+% ##########################################################################
+\section {Test Framework}
+% ##########################################################################
+
+A test framework allows you to control the changes made during development
+of your project. One way of testing are regression tests. Where you 
+start with a specified behaviour and output of your program. The goal is
+now that on every platform and for every future version of the program to
+be tested the output remains the same. Testing on different platform is 
+important because e.g., Macintosh computers use a different memory alignement
+than windows IA32 architectures.
+
+After every change and recompilation you run the test framework and check
+it the output and behaviour are still the same. Doing so guarantees that
+no wanted and tested behaviour of your program can change without you 
+noticing it just because you might have changed some unrelated part
+in your program which causes some sideeffects.
+
+In case of black box testing as it was added here, it works like this:
+You need a number of different inputs, your testcases. They never change.
+You take a version of your program of which you know that it is working
+correctly and run the program on your inputs and save the outputs.
+
+These output files are your reference outputs. They are the desired
+and specified output of your program.
+
+\begin{verbatim}
+create test framework               run test framework
+
+          input                          input
+            |                              |
+            V                              V
+       |---------|                     |--------|
+       |         |                     |        |
+       | black   |                     | black  |
+       | box     |                     | box    |
+       |         |                     |        |
+       |---------|                     |--------|
+            |                              |
+            V                              V
+    reference output                     output
+                                      who should match
+                                    the reference output
+\end{verbatim}
+
+Imagine you change some part of your program and want to know if it 
+still works correctly. Just run your test framework with the input files
+and compare your output with the reference output. In case the two
+outputs are not identical, you will have to analyze the changes 
+made in your program.
+
+There are two possibilities now. Either your changes have undesired
+sideeffects and you have to implement the changes in some other 
+way. This is the more common case. Or you have changed someting
+in the logic of your program and you know that your new input is
+valid and correct. Then you have to change your test framework
+to include the new output as the new reference output.
 
 
-\subsection {Test Framework}
+Black box means that the test result do not tell anything about how
+jlint calculates its resulting output or whether the algorithms used
+are programmed correctly. To do this, one would use unit testing.
 
-\paragraph
-A small test framework was added to jlint to allow testing the behaviour of the program. The test framework consists of a sample of class files together with the output that jlint generates when run on these files. The sample class files are chosen to cover most of jlints possible outcomes. To produce this output jlint version 3.0 was used and the output generated was stored in *.out files. These *.out files represent the reference output which should be matched by all future versions of jlint unless one changes something in the logic of jlint. Whenever there will be changes in the source code of jlint, the test framework should be used to make sure that the output of the new version is the same as the reference output. To run the test framework you need to go into the test/ directory, where you run ./testall.sh.
-
-
-Testall.sh itself calls runtest.sh, show\-diff.sh and showerror.sh.
-\\\\runtest.sh
-runs jlint on the sample java class files and writes its output into the *.log and its error messages into *.err.
-\\\\showdiff.sh
-compares the *.out generated by runtest.sh with the stored *.log files and in case of a difference makes a diff x.{out,log}
-\\\\showerror.sh
-looks for *.err file with size bigger than 0 and produces a warning and the name of the file if this happens.
-should not produce any output if nothing goes wrong. Only in the case that jlint crashes, it reports which files caused jlint to abort.
-\\
+Unit testing is a kind of white box testing where you look at the internals
+of the box. You try to text every single line of source code for a
+specified behaviour. Unit testing could be implemented in a future version
+of the test framework 
 
 
-Adding new test cases to the test framework is quite simple. A new directory eg. test5 has to be created and the classfiles to be tested have to be in that directory. in the file testall.sh the variable NROFTESTS which is currently set to 4 has to be changed to reflect the new number of test cases. First of all a new reference file eg. 5.out has to be created and put into tests/log/ .One has to be careful to use a fully functional/bugfree version of jlint to produce a new reference *.out file. Once this is done testall.sh can be called and will run the tests including the newly added ones.
-
-The tests are all blackbox tests, meaning that jlint is run on some sample input and the output is compared to the reference output. It is not tested how jlint does something. This could be done by using unit testing, which is not beeing done yet, but could be implemented in a future version of the test framework.
-Another use of the test framework is the possibility to check whether the same version of jlint produces the same output on different computer architectures. For example the Mac has a different memory alignment and could therefore show other errors than on a windows architecture.
-
-
+A small test framework was added to \texttt{jlint} to allow testing the
+behaviour of the program. The test framework consists of a sample of class
+files together with the output that \texttt{jlint} generates when run on these
+files. The sample class files are chosen to cover most of \texttt{jlint's}
+possible outcomes. To produce this output \texttt{jlint} version 3.0 was used
+and the output generated was stored in *.out files. These *.out files 
+represent the reference output which should be matched by all future versions
+of \texttt{jlint} unless one changes something in the logic of \texttt{jlint}.
+Whenever there will be changes in the source code of \texttt{jlint}, the test
+framework should be used to make sure that the output of the new version is 
+the same as the reference output. To run the test framework you need to go
+into the test/ directory, where you execute \texttt{./testall.sh}.
+\\Script \texttt{testall.sh} itself calls \texttt{runtest.sh}, 
+\texttt{show\-diff.sh} and \texttt{showerror.sh}.
+\\\\Script \texttt{runtest.sh}
+runs jlint on the sample java class files and writes its output into the 
+*.log and its error messages into *.err.
+\\\\Script \texttt{showdiff.sh}
+compares the *.out generated by \texttt{runtest.sh} with the stored *.log
+files and in case of a difference makes a diff x.{out,log}
+\\\\Script \texttt{showerror.sh}
+looks for *.err file with size bigger than 0 and produces a warning and the 
+name of the file if this happens.
+should not produce any output if nothing goes wrong. Only in the case that 
+\texttt{jlint} crashes, it reports which files caused \texttt{jlint} to abort.
 
 \begin{verbatim}
 
@@ -66,109 +167,307 @@ test4 sample from java/io/* (1.4)
 Usage:
 ------
 
-* To run testsuite using valgrind, 
+  To run testsuite using valgrind, 
 	try "./testall.sh --valgrind
 
-* For info on how to run tests, 
+  For info on how to run tests, 
 	try "./testall.sh --help"
 
 \end{verbatim}
 
 
 
+% ##########################################################################
+\section {Adding New Test Cases}
+% ##########################################################################
+
+Adding new test cases to the test framework is quite simple. A new directory
+ e.g., test5 has to be created and the classfiles to be tested must be copied
+ into that directory. In file \texttt{testall.sh} the variable
+ \texttt{NROFTESTS} which is currently set to 4 has to be changed to reflect 
+the new number of test cases. First of all a new reference file e.g., 5.out
+ has to be created in the directory \texttt{tests/log/}. One has to be careful
+ to use a fully functional (bug-free) version of \texttt{jlint} to produce a
+ new reference *.out file. Once this is done \texttt{testall.sh} can be called
+ and will run the tests including the newly added ones.
+
+% ##########################################################################
+\section {Found Errors, Bug Fixes}
+% ##########################################################################
 
 
+% ##########################################################################
+\subsection {try--catch--finally constructs in Java 1.3 and Java 1.4}
+% ##########################################################################
 
-\subsection {Found Errors , Bug Fixes}
+Before \texttt{java 1.4} byte code verifiers of the java virtual machine had
+difficulties verifying the correctness of exception handlers with a complex
+control flow. These complex exception handlers were the result of a 
+try--finally or a try--catch--finally construct.
 
-\subsubsection {Context Handling in Jlint}
+Starting with \texttt{java 1.4} this bug in the virtual machine was worked around by
+changing the compiler. The generated byte code remains the same, but the number
+and the range of the exception handlers was changed in case there is a
+finally statement in the code. 
 
-\paragraph
-Beginning with Java version 1.4.0 the the exception handling mechanismus for try--finally and 
-try--catch--finally constructs was changed. Until Java 1.3 there was only one exception handler
-for the whole try block. Since 1.4.0 the handled range is split into subranges which are all handled
-by the same exception handler. Certain instructions which cannot throw an exception anyway are excluded from the range. eg. the ``ret'' and ``jsr'' instructions. This is done as a workaround in the compiler for a bug in the java virtual machine.
+Below you can see a java source file, followed by the corresponding byte code
+and the exception table. Differences between \texttt{java 1.3} and \texttt{java 1.4} will be pointed out.
 
-example:
 \begin{verbatim}
-java/beans/SimpleBeanInfo.class
+class SC {
+    void m(boolean b) {
+        try {
+            if (b) return;
+        } finally {
+            b = false;
+        }
+    }
+}
+\end{verbatim}
+Both java compilers produce exactly the same byte code in this case.
+\\lines 0 to 7 treat the case that b == true
+\\lines 8 to 11 treat the case that b == false
+\\lines 14 to 19 treat the case that an exception occurs during the
+try block.
+\\lines 20 to 23 are for the \texttt{finally} statement which has to be 
+executed in any case.
+
+\begin{verbatim}
+void m(boolean arg1)
+Code(max_stack = 1, max_locals = 4, code_length = 26)
+0:    iload_1                   //put b on top of stack
+1:    ifeq              #8      //if b != 0
+4:    jsr               #20     //execute finally block
+7:    return                    //exit
+8:    jsr               #20     //execute finally block
+11:   goto              #25     //goto exit statement
+14:   astore_2                  //store exception
+15:   jsr               #20     //execute finally block
+18:   aload_2                   //load exception
+19:   athrow                    //rethrow exception because 
+                                //no catch statement
+20:   astore_3			
+21:   iconst_0                  //put 0 (false) on stack
+22:   istore_1                  //b = false
+23:   ret               %3      //return to stmt after jsr
+25:   return                    //exit
+
+\end{verbatim}
+
+In this code compiled by \texttt{javac 1.3} there is only one exception handler
+which is valid for lines 0 to 14 exclusive. Meaning it catches
+exceptions occuring on lines 0 to and including 11. Whereas in the
+exception table below, compiled by \texttt{javac 1.4} there is also
+just one exception handler. But the range is split twice.
+Lines 7 and 11, the ``return'' and the ``goto'' instruction
+are excluded from the range. 
+Instructions such as ``return'' and ``goto'' could be excluded from the range
+because they can never throw an exception.
+\\In the next section it is shown how jlint 2.3 
+failed to correctly interpret this new kind of exception table and how this
+bug was fixed in jlint version 3.0. 
+
+\begin{verbatim}
+Exception handler(s) =
+From    To      Handler Type
+0       14      14      <Any exception>(0)
+
 
 Exception handler(s) =
-From    To    Handler    Type
--0    40    40    java.lang.Exception(9)	//java 1.3
-+0    27    40    java.lang.Exception(9)	//java 1.4	
-+28    39    40    java.lang.Exception(9)	//java 1.4
+From    To      Handler Type
+0       7       14      <Any exception>(0)
+8       11      14      <Any exception>(0)
+14      18      14      <Any exception>(0)
+
+\end{verbatim}
+
+% ##########################################################################
+\subsection {Context Handling in \texttt{Jlint}}
+% ##########################################################################
+
+In its analysis of the class file jlint goes through the bytecode calculating
+the range of possible values for each variable. For this a context 
+datastructure is used. Contexts can be created, split and merged. Every byte
+code adress has a linked list of contexts.
+
+In the code fragment below which is from file \texttt{jlint.cc} for 
+every entry in the exception table, such a context is inserted into the linked list
+at position ``handler\_pc'' by calling ``ctx\_entry\_point(\&method-\verb+>+context[handler\_pc]);''.
+\begin{verbatim}
+while (--exception_table_length >= 0)
+{ 
+      int handler_pc = unpack2(fp+4);
+      new ctx_entry_point(&method->context[handler_pc]); 
+      fp += 8;
+}
+\end{verbatim}
+After that the byte code instructions are analyzed in jlint. Whenever it begins the
+analysis of a new instruction, for all the contexts in the corresponding linked list
+the stack is increased by one. If for example there was an exception handler at position 14
+which handled n > 1 Exception. Then the linked list of position 14 would have n entrypoint
+contexts amongst possibly other contexts. And so the stackpointer will have been increased by n 
+instead of only one. The problem here is that the stackpointer will only be reduced by one
+because there is only one exception handler in the byte code at one position, even if there is more
+than one range for the same exception handler. And so there is only one astore instruction
+where jlint will decrease the stackpointer by one. Therefore after adding more than one
+exception context at the same byte code adress the final assertion sp == stack\_bottom
+will fail and jlint returns with an error.
+
+\begin{verbatim}
+------|               |-------|
+e3    |astore1|       |aload1 |astore1|
+------|-------|-------|-------|-------|-------|
+ e2   |       |       |       |       |       |
+------|-------|-------|-------|-------|-------|
+ e1   |       |       |       |       | end   |
+------|-------|-------|-------|-------|-------| stack_bottom
+t1	t2       t3      t4      t5     t6
 \end{verbatim}
 
 
-\subsubsection {Classes of errors found}
+At time t2 the exception is stored and the stackpointer is decreased by one. But
+the stackpointer is still 2 position too high and it will remain to high
+until the end, where the assertion assert(sp == stack\_bottom) will fail.
+
+% ##########################################################################
+\subsection {Bug Related Errors}
+% ##########################################################################
+
+This bug caused jlint to exit abnormally under certain circumstances.
+Two different assertions could be violated because the simulated stack
+management didn't work properly anymore. 
+
+The First kind of error occured e.g., when analyzing file \newline
+\texttt{/java/io/BufferedReader.class}.
 
 \begin{verbatim}
-1st kind of error eg. in:
-/java/io/BufferedReader.class
 in file:    method_desc.cc
 in method:  parse_code(constant **, const field_desc *)
 	 Assertion `sp == stack_bottom' failed.
 Aborted
+\end{verbatim}
 
-2nd kind of error eg. in:
-/java/lang/FloatingDecimal.class
+The Second kind of error occured e.g., when analyzing file \newline
+\texttt{/java/lang/FloatingDecimal.class}.
+
+\begin{verbatim}
 in file:    local_context.cc
 in method:  transfer(...):
 	 Assertion `sp == come_from->stack_pointer' failed.
 Aborted 
 \end{verbatim}
 
-\subsubsection {Minimal class file that reproduced the bug}
+% ##########################################################################
+\subsection {Minimal class file that reproduced the bug}
+% ##########################################################################
+
+Below is the listing of a minimal java class file which caused jlint to abort.
+This class file does not make sense, but it is valid and gives a minimal
+number of byte code instructions. 
 
 \begin{verbatim}
 class SC {
-void m(boolean b) {
-    try {
-        if (b) return;
-    } catch (Exception e) {
-        b = true;
-    } finally {
-        b = false;
+    void m() {
+        try {
+        } finally {
+        }
     }
 }
 \end{verbatim}
 
-\subsubsection {Bugfix}
 
-The following code was added to jlint.cc to fix the bug.
+% ##########################################################################
+\subsection {Bugfix}
+% ##########################################################################
+
+Here is the diff of the old and the new version of \texttt{jlint.cc}:
+
 
 \begin{verbatim}
 
-	/*  add new entry for exception-handles.It is expected
-	** that the handles are ordered. Only one handle for 
-	** every byte code adress. eg: in the following example only 
-	** add entries at position 16 and 25 . 
-	** from         to         handle
-	**  2           10           16
-	** 12           14           16
-	** 20           23           25
-	*/
-
-	int old_handler_pc = -1;
-
-        while (--exception_table_length >= 0) { 
-          int handler_pc = unpack2(fp+4);
-	  if ( handler_pc != old_handler_pc) {
-	    new ctx_entry_point(&method->context[handler_pc]); 
-	  }
-	  fp += 8;
-	  old_handler_pc = handler_pc;
-        }
+diff -u jlint_old.cc jlint.cc
+--- jlint_old.cc        2003-04-26 15:29:23.000000000 +0200
++++ jlint.cc    2003-08-23 15:23:36.000000000 +0200
+@@ -504,10 +504,45 @@
+                sizeof(local_context*)*(code_length+1));
+ 
+         int exception_table_length = unpack2(fp); fp += 2;
++
++       /* add new entry for each distinct "byte code adress 
++       ** of handle".
++       **
++       ** if an exception handler at byte code "pos" handles
++       ** exception of more than one byte code range, call
++       ** "new ctx_entry_point(&method->context[pos]);" only
++       ** once! Because otherwise the stack gets out of 
++       ** control. 
++       **
++       ** in the following example there are two different
++       ** handle adresses 16 and 25. and for each of them 
++       **"new ctx_entry_point(&method->context[handler_pc]);"
++       ** is called exactly once. Therefore the program calls
++       ** new ctx_entry_point(&method->context[16]);
++       ** new ctx_entry_point(&method->context[25]);
++       ******************************************************
++       ** Example Exception Table:                         **
++       ** -------------------------------------            **
++       **                                                  **
++       **                      byte code adress            **
++       ** from         to        of handle                 **
++       **  2           10           16                     **
++       ** 12           14           16                     **
++       ** 20           23           25                     **
++       ******************************************************
++       **
++       ** it is expected that the byte code adresses of the
++       ** handles are ordered. If this would not be the case,
++       ** a simple comparison of handler_pc and 
++       ** old_handler_pc would not be sufficient!
++       */
++
++       int old_handler_pc = -1;
++
+         while (--exception_table_length >= 0) { 
+           int handler_pc = unpack2(fp+4);
+-          new ctx_entry_point(&method->context[handler_pc]); 
+-          fp += 8;
++         if ( handler_pc != old_handler_pc) {
++           new ctx_entry_point(&method->context[handler_pc]); 
++         }
++         fp += 8;
++         old_handler_pc = handler_pc;
+         }
+ 
+         int method_attr_count = unpack2(fp); fp += 2;
 
 \end{verbatim}
 
+% ##########################################################################
+\section {Changes to the Build Process}
+% ##########################################################################
 
-\subsection {Changes of the Build Process}
+A new and automated build process was implemented during this Semester project.
+Before, there was no ./configure. The \texttt{Makefile} had to be changed
+manually if one wanted to set some architecture specific flags or if one wanted
+a debugging build or a build for a different target machine. The dependencies 
+for compilation are automatically generated using a perl script: 
+\texttt{mkmf.pl}. A configure script was added which calculates the options 
+and sets environment variables depending on the Operating System and TODO 
+SPECIFY: does various other things. This configure script generates the 
+\texttt{Makefile}. More precisely it takes a standard \texttt{Makefile.in} 
+and replaces the unspecified options by values it calculates.
 
-A new and automated build process was implemented during this semester thesis. Before, there was a makefile which one had to change from hand if one wanted to change some architecture specific flags. Of if one wanted a debugging build or a build for a different target machine. The dependencies are automatically generated using a perl script: mkmf.pl. I added a configure script which calculates the options and sets environment variables depending on the OS and does various other things. This configure script generates the makefile. Or better said: it takes a standard Makefile.in and replaces the unspecified options by values it calculates.
+The new target test\_dist was added to the \texttt{Makefile}. 
+''make test\_dist'' builds a tar.gz of the sources including the test 
+directory with all the testfiles. It is intended to be used by future 
+developers of \texttt{jlint} to be able to check for errors.
 
-The new target test\_dist was added to the makefile. ''make test\_dist'' builds a tar.gz of the sources including the test directory with all the testfiles. It is intended to be used by future developers of jlint to be able to check for errors.
+% ##########################################################################
+\section {Results and Conclusion}
+% ##########################################################################
+
+TODO: 4 Tests with, one bug fixed and one file 
+\texttt{method\_desc.cc} was properly documented etc etc
 
 
 \end{document}

@@ -62,7 +62,8 @@ case "$1" in
 
 	echo "running valgrind runtest.sh"
 	`valgrind -v $DIR/runtest.sh $NROFTESTS`
-	[ "$?" != "0" ] && echo "valgrind runtest.sh exited abnormally" && exit -1
+	[ "$?" != "0" ] && echo "valgrind runtest.sh exited abnormally" && 
+								    exit -1
 		    
 	echo "running showdiff.sh"
 	`$DIR/showdiff.sh`

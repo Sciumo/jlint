@@ -1,9 +1,10 @@
 //-< JLINT.CC >------------------------------------------------------+--------+
-// Jlint                      Version 2.2        (c) 1998  GARRET    |     ?  |
+// Jlint                      Version 3.0        (c) 1998  GARRET    |     ?  |
 // (Java Lint)                                                       |   /\|  |
 //                                                                   |  /  \  |
-//                          Created:     28-Mar-98    K.A. Knizhnik  | / [] \ |
-//                          Last update: 05-Jun-01    Cyrille Artho  | GARRET |
+//   Created:                    28-Mar-98    K.A. Knizhnik          | / [] \ |
+//   Version 2.X:   Last update: 05-Jun-01    Cyrille Artho          | GARRET |
+//   Version 3.X:   Last update: 20-Aug-03    Raphael Ackermann      |        |
 //-------------------------------------------------------------------+--------+
 // Java verifier 
 //-------------------------------------------------------------------+--------+
@@ -505,14 +506,33 @@ bool parse_class_file(byte* fp)
 
         int exception_table_length = unpack2(fp); fp += 2;
 
-	/*  add new entry for exception-handles.It is expected
-	** that the handles are ordered. Only one handle for 
-	** every byte code adress. eg: in the following example only 
-	** add  entries at position 16 and 25 . 
-	** from         to         handle
-	**  2           10           16
-	** 12           14           16
-	** 20           23           25
+	/* add new entry for each distinct "byte code adress of handle".
+	**
+	** if an exception handler at byte code "pos" handles exception of
+	** more than one byte code range, call
+	** "new ctx_entry_point(&method->context[pos]);" only once! Because
+	** otherwise the stack gets out of control. 
+	**
+	** in the following example there are two different handle adresses
+	** 16 and 25. and for each of them 
+	** "new ctx_entry_point(&method->context[handler_pc]);" is called 
+	** exactly once. Therefore the program calls :
+	** new ctx_entry_point(&method->context[16]);
+	** new ctx_entry_point(&method->context[25]);
+	**********************************************************************
+	** Example Exception Table:                                         **
+	** -------------------------------------                            **
+	**                                                                  **
+	**                      byte code adress                            **
+	** from         to        of handle                                 **
+	**  2           10           16                                     **
+	** 12           14           16                                     **
+	** 20           23           25                                     **
+	**********************************************************************
+	**
+	** it is expected that the byte code adresses of the handles are 
+	** ordered. If this would not be the case, a simple comparison of
+	** handler_pc and old_handler_pc would not be sufficient!
 	*/
 
 	int old_handler_pc = -1;
