@@ -2,17 +2,7 @@
 #define TYPES_HH
 
 #include <string>
-
-#ifdef HASH_TABLE
-#include <hash_map>
-#else
-#include <map>
-#endif
-#ifdef HASH_TABLE
-  typedef hash_map<const char *, int, hash<const char *>, equal_to<const char *> > monitor_table;
-#else
-  typedef map<const char *, int, less<const char *> > monitor_table;
-#endif
+#include <vector>
 
 #include <stddef.h>
 
@@ -142,7 +132,7 @@ struct vbm_operand {
   int4 mask;  // mask of possible set bits and zero value indicator for 
   // object types
   int  index; // index of local veriable, which value was loaded in stack
-  field_desc* equals;
+  const field_desc* equals;
 };
 
 #define IS_INT_TYPE(tp) (tp <= tp_int)
@@ -221,7 +211,6 @@ extern int max_shown_paths;
 extern char* source_file_path;
 extern int   source_file_path_len;
 extern bool  source_path_redefined;
-extern int verbose;
 extern int n_messages;
 
 #endif

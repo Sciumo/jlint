@@ -2,6 +2,7 @@
 #define CLASS_DESC_HH
 
 #include "types.hh"
+#include "locks.hh"
 #include "utf_string.hh"
 #include "field_desc.hh"
 #include "graph.hh"
@@ -10,8 +11,7 @@
 
 class class_desc { 
 public:
-  monitor_table monitors;
-  // locks held by current object
+  Locks locks; // locks held by current thread
 
   utf_string     name;
   utf_string     source_file;

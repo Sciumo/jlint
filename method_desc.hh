@@ -6,8 +6,6 @@ class overridden_method;
 class access_desc;
 class callee_desc;
 
-#include <string>
-#include <vector>
 #include "types.hh"
 #include "inlines.hh"
 #include "component_desc.hh"
@@ -19,10 +17,11 @@ class callee_desc;
 #include "local_context.hh"
 #include "functions.hh"
 #include "access_desc.hh"
+#include "string_pool.hh"
 class local_context;
 
 class method_desc : public component_desc {
-  
+
 public:
   utf_string     desc;
   method_desc*   next;
@@ -112,7 +111,7 @@ public:
 
   void basic_blocks_analysis();
 
-  void parse_code(constant** constant_pool);
+  void parse_code(constant** constant_pool, const field_desc* is_this);
 
   method_desc(utf_string const& mth_name, utf_string const& mth_desc, 
               class_desc* cls_desc, method_desc* chain) 
@@ -120,6 +119,7 @@ public:
     { 
       callees = NULL;
       accessors = NULL;
+      vertex = NULL;
       attr = m_serialized;
       next = chain;
       first_line = 0;
@@ -134,5 +134,6 @@ private:
   field_desc* getNew(); // returns new field desc* and increments counter
 };
 
-
+extern string_pool stringPool; // declared in jlint.cc
+extern field_desc* is_const;
 #endif

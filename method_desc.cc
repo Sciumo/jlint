@@ -83,12 +83,15 @@ void method_desc::check_invocations()
 bool method_desc::build_call_graph(method_desc* caller, callee_desc* callee, 
                                    int caller_attr)
 {
+  if (caller == this) {
+    return false; // work around bug...
+  }
   callee->backtrace = caller;
   for (overridden_method* ovr = overridden; ovr != NULL; ovr = ovr->next) { 
     ovr->method->build_call_graph(caller, callee, caller_attr);
   }
   if (attr & m_synchronized) { 
-    if (!(caller_attr & callee_desc::i_self)) { 
+    if (!(caller_attr & callee_desc::i_self)) {
 #ifdef DUMP_EDGES
       char buf[2][MAX_MSG_LENGTH];
       caller->demangle_method_name(buf[0]);
@@ -608,7 +611,8 @@ void method_desc::basic_blocks_analysis()
   }
 }
 
-void method_desc::parse_code(constant** constant_pool)
+void method_desc::parse_code(constant** constant_pool,
+                             const field_desc* is_this)
 {
   const int indirect = 0x100;
   byte* pc = code;
@@ -624,6 +628,7 @@ void method_desc::parse_code(constant** constant_pool)
   local_context* ctx;
   byte prev_cop = nop;
   bool super_finalize = false;
+
 #ifdef INT8_DEFINED
   int8 left_min;
   int8 left_max;
@@ -646,6 +651,7 @@ void method_desc::parse_code(constant** constant_pool)
 
   in_monitor = false;
   stack[0].type = stack[1].type = tp_void;
+  cls->locks.clear();
   basic_blocks_analysis();
 
   for (i = 0; i < 32; i++) { 
@@ -659,8 +665,7 @@ void method_desc::parse_code(constant** constant_pool)
       }
     }
   }
-  // init. is_this
-  field_desc* is_this = new field_desc(utf_string("<this>"), NULL, NULL);
+  
   if (!(attr & m_static)) { 
     vars[0].type = tp_self;
     vars[0].mask = var_desc::vs_not_null;
@@ -751,6 +756,7 @@ void method_desc::parse_code(constant** constant_pool)
           sp->mask = var_desc::vs_not_null;
         }
         sp->index = NO_ASSOC_VAR;
+        sp->equals = is_const;
         sp += 1;
       }
       break;
@@ -2253,6 +2259,7 @@ void method_desc::parse_code(constant** constant_pool)
         const_utf8* cls_name=(const_utf8*)constant_pool[cls_info->name];
         class_desc* obj_cls = class_desc::get(*cls_name);
         field_desc* field = obj_cls->get_field(*field_name);
+        field->name_and_type = nt;
 
         if (cop == getfield) { 
           check_variable_for_null(addr, sp);
@@ -2330,6 +2337,15 @@ void method_desc::parse_code(constant** constant_pool)
         }
         int type = get_type(*desc);
         sp -= (type == tp_long || type == tp_double) ? 2 : 1;
+        if (sp->equals != NULL) {
+          if (sp->equals->name_and_type != nt) {
+            /*field_desc* aux = new field_desc(*(sp->equals));
+            aux->name_and_type = nt;
+            sp->equals = aux;
+            equal_descs.insert(equal_descs.begin(), aux);*/
+            sp->equals = is_const;
+          }
+        }
         field->equals = sp->equals;
         if (cop == putfield) { 
           sp -= 1;
@@ -2384,9 +2400,9 @@ void method_desc::parse_code(constant** constant_pool)
 #endif
         if (cls_name == "java/lang/Object") { 
           bool hold_lock = false;
-          char* wait_on;
+          Lock wait_on;
           if (sp[-fp].equals != NULL) { 
-            wait_on = sp[-fp].equals->name.as_asciz();
+            wait_on = sp[-fp].equals;
           } else {
             wait_on = NULL;
           }
@@ -2394,8 +2410,8 @@ void method_desc::parse_code(constant** constant_pool)
               || mth_name == "notify_all" 
               || mth_name == "wait") { 
             if (attr & m_synchronized) { // add "this" to lock set if needed
-              cls->monitors.insert(monitor_table::value_type("<this>", 1));              
-              if (wait_on == "<this>") {
+              cls->locks.acquire(is_this);
+              if (wait_on == is_this) {
                 hold_lock = true;
               }
             }
@@ -2403,43 +2419,46 @@ void method_desc::parse_code(constant** constant_pool)
             if (!(attr & m_synchronized)) {
               // check whether lock on object which is waited on is owned
               if (wait_on != NULL) {
-                monitor_table::const_iterator entry = 
-                  cls->monitors.find(wait_on);
-                if (entry != cls->monitors.end()) {
+                if (cls->locks.owns(wait_on)) {
                   hold_lock = true;
                 }
               }
             }
             if (!hold_lock) {
-              message(msg_wait_nosync, addr, wait_on, &mth_name);
+              message(msg_wait_nosync, addr, 
+                      (wait_on != NULL ? 
+                       wait_on->name.as_asciz() :
+                       "<unknown>"), 
+                      &mth_name);
             }
           }
           if (mth_name == "wait") { 
             wait_line = get_line_number(addr);
             attr |= m_wait;
             // check whether other locks are held
-            if (cls->monitors.size() - (hold_lock? 1:0) > 0) {
+            if (cls->locks.nLocks() - (hold_lock? 1:0) > 0) {
               message(msg_wait, addr);
-              if (verbose) { // print all other montors
-                char buf[100]; // buffer for locks
-                char* out = buf;
-                int n;
-                monitor_table::const_iterator entry = cls->monitors.begin();
-                while (entry != cls->monitors.end()) {
-                  if ((n = snprintf(out, sizeof(buf)-(out-buf), 
-                                    " %s,", entry->first)) == -1) {
-                    // no space in buffer left - print "..." at end of buffer
-                    sprintf(buf+sizeof(buf)-4, "...");
-                    out = buf + sizeof(buf) - 1;
-                    break;
-                  }
-                  out += n;
-                  entry++;
+              // print all other locks
+              char buf[MAX_MSG_LENGTH - 40]; // buffer for locks
+              char* out = buf;
+              int n;
+              monitor_stack::const_iterator entry = cls->locks.begin();
+              while (entry != cls->locks.end()) {
+                if ((n = snprintf(out, 
+                                  sizeof(buf)-(out-buf), 
+                                  " %s,", 
+                                  (*entry)->name.as_asciz())) == -1) {
+                  // no space in buffer left - print "..." at end of buffer
+                  sprintf(buf+sizeof(buf)-4, "...");
+                  out = buf + sizeof(buf) - 1;
+                  break;
                 }
-                *(out-1) = '\0';
-                message(msg_locklist, addr, cls->monitors.size(), buf);
-                n_messages--; // avoid counting message twice
+                out += n;
+                entry++;
               }
+              *(out-1) = '\0';
+              message(msg_locklist, addr, cls->locks.nLocks(), buf);
+              n_messages--; // avoid counting message twice
             }
           }
         } // end of wait/notify treatment
@@ -2448,7 +2467,7 @@ void method_desc::parse_code(constant** constant_pool)
             super_finalize = true;
           }
         } else { 
-          method_desc* method = obj_cls->get_method(mth_name,mth_desc);
+          method_desc* method = obj_cls->get_method(mth_name, mth_desc);
           int call_attr = 0;
           if (cop != invokestatic && sp[-fp].type == tp_self) { 
             call_attr |= callee_desc::i_self;
@@ -2574,14 +2593,104 @@ void method_desc::parse_code(constant** constant_pool)
         in_monitor += 1;
         sp -= 1;
         if (sp->equals != NULL) {
-          cls->monitors.insert(monitor_table::value_type(sp->equals->name.as_asciz(), 1));
           // mark monitor ownership; use monitor count in later version
+          Lock curr = cls->locks.getInnermost();
+          cls->locks.acquire(sp->equals);
+          if (sp->equals->name_and_type != NULL) {
+            class_desc* curr_cls;
+            
+            // get class descriptor of current innermost lock (a)
+            // instead of normal class descriptor, use TYPE.variable_name
+            // this will allow us to distinguish between instances (imperfectly)
+            if (curr != NULL) {
+              // already holding a lock
+              /* utf_string* curr_class_type = 
+                 dynamic_cast<utf_string*>(constant_pool[curr->name_and_type->desc]); */
+              const char* curr_class_name;
+              const char* curr_lock_name = curr->name.as_asciz();
+              if (curr->name_and_type->name == 0) {
+                curr_class_name = cls->name.as_asciz();
+              } else {
+                curr_class_name = curr->cls->name.as_asciz();
+                  /*                  ((utf_string*)(constant_pool[curr->name_and_type->desc]))->as_asciz();*/
+              }
+              char* curr_full_name = 
+                (char *)malloc((size_t)(strlen(curr_class_name) + 
+                                        strlen(curr_lock_name) + 2));
+              /* Add one byte for '.' and for '\0'. */
+              strcpy(curr_full_name, curr_class_name);
+              char* tmp = curr_full_name + strlen(curr_full_name); 
+              // point to \0
+              *tmp = '.';
+              strcpy(++tmp, curr_lock_name);
+              const char* curr_name = stringPool.add(curr_full_name);
+              free(curr_full_name);
+              curr_cls = class_desc::get(utf_string(curr_name));
+              
+              method_desc* caller_method = curr_cls->get_method(utf_string("<synch>"), utf_string("()"));
+              /* try the following:
+               * curr_cls = class_desc::get(*curr_class_type)
+               * caller_method = ...(<synch>, owner() 
+               * same below 
+               * this may solve the problem of multiple and false warnings
+               * when analyzing multiple source file with same variable names 
+               * if this does not help, use fully qualified variable name 
+               * including name of package in owner object (plus method
+               * name if it is a local variable)
+               * maybe exact type is needed as well (including desc) */
+              caller_method->attr |= method_desc::m_synchronized;
+              if (caller_method->vertex == NULL) {
+                caller_method->vertex = new graph_vertex(curr_cls);
+              }
+
+              // get class descriptor of object type of new lock (b)
+              const char* class_name = sp->equals->cls->name.as_asciz();
+              const char* lock_name = sp->equals->name.as_asciz();
+
+              char* full_name = 
+                (char *)malloc((size_t)(strlen(class_name) + 
+                                        strlen(lock_name) + 2));
+              /* Add one byte for '.' and for '\0'. */
+              strcpy(full_name, class_name);
+              /* char* */ tmp = full_name + strlen(full_name); // point to \0
+              *tmp = '.';
+              strcpy(++tmp, lock_name);
+              lock_name = stringPool.add(full_name);
+              free(full_name);
+              class_desc* obj_cls = class_desc::get(utf_string(lock_name));
+
+              // add call from a to dummy method b.<synch>
+              method_desc* method = 
+                obj_cls->get_method(utf_string("<synch>"), 
+                                    utf_string("()"));
+              method->attr |= method_desc::m_synchronized;
+              if (method->vertex == NULL) {
+                method->vertex = new graph_vertex(obj_cls);
+              }
+              obj_cls->source_file = cls->source_file;
+              
+              // add call from a.<synch> to b.<synch>
+              int call_attr = 0;
+              call_attr |= callee_desc::i_synchronized;
+              method->callees =
+                new callee_desc(obj_cls, method, method->callees,
+                                get_line_number(addr), call_attr);
+              int caller_attr = 0;
+              caller_attr |= method_desc::m_synchronized;
+
+              method->build_call_graph(caller_method, method->callees,
+                                       caller_attr);
+              //free(full_name);
+            }
 #ifdef DUMP_MONITOR
-          printf("%s acquires lock on %s\n", 
-                 cls->name.as_asciz(),
-                 sp->equals->name.as_asciz()
-                 );
-#endif  
+            printf("%s acquires lock on %s.%s (type %s)\n", 
+                   cls->name.as_asciz(),
+                   sp->equals->cls->name.as_asciz(),
+                   sp->equals->name.as_asciz(),
+                   ((const_utf8*)constant_pool[sp->equals->name_and_type->desc])->as_asciz()
+                   );
+#endif
+          }
         }
       }    
       break;
@@ -2592,17 +2701,14 @@ void method_desc::parse_code(constant** constant_pool)
         }
         sp -= 1;
         if (sp->equals != NULL) {
-          monitor_table::iterator entry = 
-            cls->monitors.find(sp->equals->name.as_asciz());
-          if (entry != cls->monitors.end()) {
-            cls->monitors.erase(entry);
-          }
 #ifdef DUMP_MONITOR
-          printf("%s relinquishes lock on %s\n", 
+          printf("%s relinquishes lock on %s.%s\n", 
                  cls->name.as_asciz(),
+                 sp->equals->cls->name.as_asciz(),
                  sp->equals->name.as_asciz()
                  );
 #endif  
+          cls->locks.release(sp->equals);
         }
       }
       break;
@@ -2807,6 +2913,15 @@ void method_desc::parse_code(constant** constant_pool)
     message(msg_super_finalize, 0);
   }
   // cleanup
+  for (field_desc** fd = equal_descs.begin(); fd != equal_descs.end(); fd++) {
+    /*    if (! strncmp("<new>", (*fd)->name.as_asciz(), 5)) {
+          // free <new> constants which are not in constant pool*/
+      free((*fd)->name.as_asciz());
+      /*}*/
+    delete *fd;
+  }
+  equal_descs.clear();
+
   for (i = code_length; i >= 0; i--) { 
     local_context* next;
     for (ctx = context[i]; ctx != NULL; ctx = next) {
@@ -2817,12 +2932,6 @@ void method_desc::parse_code(constant** constant_pool)
   delete[] var_store_count;
   delete[] line_table;
   delete[] context;
-  delete is_this;
-  for (field_desc** fd = equal_descs.begin(); fd != equal_descs.end(); fd++) {
-    free((*fd)->name.as_asciz());
-    delete *fd;
-  }
-  equal_descs.clear();
 }
 
 field_desc* method_desc::getNew() {
@@ -2830,7 +2939,7 @@ field_desc* method_desc::getNew() {
   strcpy(name, "<new>");
   assert(equal_descs.size() < 10000); // 4 characters allowed
   sprintf(name + strlen(name), "%d", equal_descs.size());
-  field_desc* fd = new field_desc(utf_string(name), NULL, NULL);
+  field_desc* fd = new field_desc(utf_string(name), cls, NULL);
   equal_descs.insert(equal_descs.begin(), fd);
   return fd;
 }

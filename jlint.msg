@@ -16,6 +16,7 @@
 //
 MSG(deadlock,sync_loop,0,"Loop %2d: invocation of synchronized method %3m can cause deadlock")
 MSG(deadlock,loop,0,"Loop %2d/%3d: invocation of method %4m forms the loop in class dependency graph")
+MSG(deadlock,lock,0,"Lock %2s can be acquired while holding lock %3s, with other thread holding %3s and waiting for %2s")
 MSG(deadlock,wait,0,"Method wait() can be invoked with monitor of other object locked")
 MSG(deadlock,locklist,0,"Holding %2d lock(s):%3s")
 MSG(deadlock,wait_path,0,"Call sequence to method %2m can cause deadlock in wait()")

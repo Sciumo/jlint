@@ -10,6 +10,7 @@ class constant {
   virtual int length() = 0;
   virtual type_tag type() { return tp_object; }
   constant(byte* p) { tag = *p; }
+  constant() { tag = 0; } // for is_this
 };
 
 class const_class : public constant {
@@ -66,6 +67,10 @@ class const_name_and_type : public constant {
   const_name_and_type(byte* p) : constant(p) {
     name = unpack2(p+1);
     desc = unpack2(p+3);
+  }
+  const_name_and_type(int n, int t) { // used for is_this
+    name = n;
+    desc = t;
   }
   int length() { return 5; }
 };

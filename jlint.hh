@@ -27,6 +27,7 @@
 #include "var_desc.hh"
 #include "local_context.hh"
 #include "overridden_method.hh"
+#include "string_pool.hh"
 
 enum const_types { 
     c_none,

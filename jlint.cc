@@ -31,7 +31,9 @@ char* source_file_path;
 int   source_file_path_len;
 bool  source_path_redefined = false;
 int   reported_message_mask = cat_all;
-FILE* history; 
+FILE* history;
+string_pool stringPool;
+field_desc* is_const;
 
 message_descriptor msg_table[] = {
 #define MSG(category, code, position_dependent, format) \
@@ -236,6 +238,7 @@ void format_message(int code, utf_string const& file, int line, va_list ap)
           *dst++ = *src++;
         }
       }
+      *dst++ = '.';
       *dst = 0;
       if (history != NULL) { 
         if (compound_message != NULL) { 
@@ -321,12 +324,17 @@ bool parse_class_file(byte* fp)
   fp += 2;
   constant** constant_pool = new constant*[constant_pool_count];
   memset(constant_pool, 0, sizeof(constant*)*constant_pool_count);
+
+  int name_index = 0;
   for (i = 1; i < constant_pool_count; i++) { 
     constant* cp = NULL;
     int n_extra_cells = 0;
     switch (*fp) { 
     case c_utf8:
       cp = new const_utf8(fp);
+      if (!strcmp(((const_utf8*)cp)->as_asciz(), "this")) {
+        name_index = i;
+      }
       break;
     case c_integer:
       cp = new const_int(fp);
@@ -377,6 +385,18 @@ bool parse_class_file(byte* fp)
 
   set_class_source_path(this_class);
 
+  // init. is_this
+  field_desc* is_this = new field_desc(utf_string("<this>"), NULL, NULL);
+  // assign name_and_type for is_this - find name entry "this" and obj. type
+  is_this->name_and_type =
+    new const_name_and_type(name_index,
+                            ((const_class*)constant_pool[this_class_name])->name);
+  is_this->equals = is_this;
+  is_this->cls = this_class;
+
+  // init. is_const
+  field_desc* is_const = new field_desc(utf_string("<const>"), NULL, NULL);
+
   this_class->attr = access_flags;
   if (super_class_name == 0) { // Object class
     assert(interfaces_count == 0); 
@@ -398,7 +418,7 @@ bool parse_class_file(byte* fp)
   }
   int fields_count = unpack2(fp);
   fp += 2;
-    
+
   while (--fields_count >= 0) {
     int access_flags = unpack2(fp); fp += 2;
     int name_index = unpack2(fp); fp += 2;
@@ -548,7 +568,7 @@ bool parse_class_file(byte* fp)
 #ifdef DEBUG
         printf("Method %s\n", mth_name->as_asciz());
 #endif
-        method->parse_code(constant_pool);
+        method->parse_code(constant_pool, is_this);
       } else { 
         fp += attr_len;
       }
@@ -558,6 +578,10 @@ bool parse_class_file(byte* fp)
     delete constant_pool[i];
   }
   delete[] constant_pool;
+  delete is_this->name_and_type;
+  delete is_this;
+  delete is_const;
+
   return true;
 }
 

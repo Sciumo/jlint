@@ -7,8 +7,6 @@ class_desc::class_desc(utf_string const& str)
   methods = NULL;
   n_bases = 0;
   attr = cl_system;
-  class_vertex = NULL;
-  metaclass_vertex = NULL;
   class_vertex = new graph_vertex(this);
   metaclass_vertex = new graph_vertex(this);
   next = chain;
@@ -44,7 +42,7 @@ method_desc* class_desc::get_method(utf_string const& mth_name,
                                     utf_string const& mth_desc) 
 { 
   for (method_desc* method = methods; method != NULL; method = method->next){
-    if (method->name == mth_name && method->desc == mth_desc) { 
+    if (method->name == mth_name && method->desc == mth_desc) {
       return method;
     }
   }
@@ -130,7 +128,7 @@ void class_desc::check_inheritance(class_desc* derived)
           }
           break;
         }
-      } 		    
+      }    
     }
     if (match != NULL && !overridden) { 
       message_at(msg_not_overridden, derived->source_file, 

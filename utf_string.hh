@@ -14,7 +14,7 @@ extern unsigned int string_hash_function(byte* p);
 
 class utf_string {
  protected:
-  int   len;
+  int   len; // string length without trailing \0
   byte* data;
 
  public:

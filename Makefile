@@ -10,15 +10,15 @@ CPP=g++
 # remove -DHASH_TABLE for really old systems without SGI's hash implementations
 
 # Debug version
-#CFLAGS = -c -Wall -O0 -g -DHASH_TABLE -DDUMP_MONITOR -DDEBUG
-#CFLAGS = -c -Wall -O0 -g -DHASH_TABLE -DDUMP_EDGES -DDUMP_BYTE_CODES -DPRINT_PC -DDUMP_STACK -DDUMP_MONITOR -DDEBUG
+CFLAGS = -c -Wall -O0 -g -DSLIST -DHASH_TABLE -DDUMP_MONITOR -DDEBUG -DDUMP_EDGES
+#CFLAGS = -c -Wall -O0 -g -DSLIST -DHASH_TABLE -DDUMP_EDGES -DDUMP_BYTE_CODES -DPRINT_PC -DDUMP_STACK -DDUMP_MONITOR -DDEBUG
 
 # Optimized version
 
-CFLAGS = -c -Wall -O2 -g -DHASH_TABLE
+#CFLAGS = -c -Wall -O2 -g -DSLIST -DHASH_TABLE
 
 # Optimized version with switched off asserts
-#CFLAGS = -c -Wall -O2 -g -DNDEBUG -DHASH_TABLE
+#CFLAGS = -c -Wall -O2 -g -DSLIST -DNDEBUG -DHASH_TABLE
 
 LFLAGS=-g
 
@@ -43,6 +43,8 @@ install:
 	cp jlint antic $(INSTALL_DIR)
 	chmod 755 $(INSTALL_DIR)/antic
 	chmod 755 $(INSTALL_DIR)/jlint
+
+
 
 
 
@@ -80,28 +82,32 @@ jlint.o: jlint.cc \
 	overridden_method.hh \
 	jlint.d \
 	functions.hh \
-	inlines.hh
+	inlines.hh \
+	string_pool.hh \
+	locks.hh
 	$(CPP) $(CFLAGS) jlint.cc
 
 access_desc.o: access_desc.cc \
 	access_desc.hh \
 	class_desc.hh \
 	functions.hh \
-	utf_string.hh \
 	types.hh \
+	locks.hh \
+	utf_string.hh \
 	field_desc.hh \
 	graph.hh \
 	method_desc.hh \
 	overridden_method.hh \
-	message_node.hh \
 	jlint.d \
 	jlint.msg \
+	message_node.hh \
 	component_desc.hh \
 	inlines.hh \
 	var_desc.hh \
 	constant.hh \
 	callee_desc.hh \
-	local_context.hh
+	local_context.hh \
+	string_pool.hh
 	$(CPP) $(CFLAGS) access_desc.cc
 
 message_node.o: message_node.cc \
@@ -125,10 +131,12 @@ method_desc.o: method_desc.cc \
 	local_context.hh \
 	functions.hh \
 	access_desc.hh \
+	string_pool.hh \
 	jlint.d \
 	jlint.msg \
 	utf_string.hh \
 	message_node.hh \
+	locks.hh \
 	graph.hh \
 	overridden_method.hh
 	$(CPP) $(CFLAGS) method_desc.cc
@@ -149,51 +157,57 @@ graph.o: graph.cc \
 	local_context.hh \
 	functions.hh \
 	access_desc.hh \
+	string_pool.hh \
 	utf_string.hh \
 	message_node.hh \
+	locks.hh \
 	overridden_method.hh
 	$(CPP) $(CFLAGS) graph.cc
 
 class_desc.o: class_desc.cc \
 	class_desc.hh \
-	utf_string.hh \
 	types.hh \
+	locks.hh \
+	utf_string.hh \
 	field_desc.hh \
 	graph.hh \
 	method_desc.hh \
 	overridden_method.hh \
-	functions.hh \
-	message_node.hh \
 	jlint.d \
 	jlint.msg \
+	functions.hh \
+	message_node.hh \
 	component_desc.hh \
 	inlines.hh \
 	var_desc.hh \
 	constant.hh \
 	callee_desc.hh \
 	local_context.hh \
-	access_desc.hh
+	access_desc.hh \
+	string_pool.hh
 	$(CPP) $(CFLAGS) class_desc.cc
 
 callee_desc.o: callee_desc.cc \
 	callee_desc.hh \
 	class_desc.hh \
 	functions.hh \
-	utf_string.hh \
 	types.hh \
+	locks.hh \
+	utf_string.hh \
 	field_desc.hh \
 	graph.hh \
 	method_desc.hh \
 	overridden_method.hh \
-	message_node.hh \
 	jlint.d \
 	jlint.msg \
+	message_node.hh \
 	component_desc.hh \
 	inlines.hh \
 	var_desc.hh \
 	constant.hh \
 	local_context.hh \
-	access_desc.hh
+	access_desc.hh \
+	string_pool.hh
 	$(CPP) $(CFLAGS) callee_desc.cc
 
 local_context.o: local_context.cc \
@@ -213,6 +227,8 @@ local_context.o: local_context.cc \
 	callee_desc.hh \
 	field_desc.hh \
 	access_desc.hh \
+	string_pool.hh \
+	locks.hh \
 	graph.hh \
 	overridden_method.hh
 	$(CPP) $(CFLAGS) local_context.cc

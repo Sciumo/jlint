@@ -19,7 +19,7 @@ public:
     vs_new      = 0x04  // variable points to object created by new
   };
   
-  field_desc*    equals;
+  const field_desc* equals;
 
   var_desc() {
     equals = NULL;

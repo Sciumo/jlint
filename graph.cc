@@ -5,7 +5,12 @@ void graph_edge::message(int loop_id)
     caller->print_call_path_to(invocation, loop_id, 0);
     class_desc* abstract_class = invocation->method->cls; 
     invocation->method->cls = vertex->cls;
-    invocation->message(msg_sync_loop, (void*)loop_id, invocation->method);
+    if (!strcmp(invocation->method->name.as_asciz(), "<synch>")) {
+      // special error message about synchronized blocks
+      invocation->message(msg_lock, invocation->self_class->name.as_asciz(), caller->cls->name.as_asciz());
+    } else {
+      invocation->message(msg_sync_loop, (void*)loop_id, invocation->method);
+    }
     invocation->method->cls = abstract_class;
     mask |= (1 << (loop_id & 31));
 }
@@ -27,7 +32,7 @@ void graph_vertex::verify()
     root->visited |= flag_vertex_on_path;
     root->marker = ++marker;
 
-    while (edge != NULL) { 
+    while (edge != NULL) {
       while (edge->vertex->marker >= marker || 
              edge->vertex->visited < max_shown_paths) 
         {
