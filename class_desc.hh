@@ -1,8 +1,8 @@
 #ifndef CLASS_DESC_HH
 #define CLASS_DESC_HH
 
-#include "utf_string.hh"
 #include "types.hh"
+#include "utf_string.hh"
 #include "field_desc.hh"
 #include "graph.hh"
 #include "method_desc.hh"
@@ -10,6 +10,9 @@
 
 class class_desc { 
 public:
+  monitor_table monitors;
+  // locks held by current object
+
   utf_string     name;
   utf_string     source_file;
   class_desc*    next;
@@ -20,8 +23,7 @@ public:
   int            attr; 
   enum class_attrs { 
     cl_interface = 0x00200,
-
-      cl_system    = 0x10000	    
+    cl_system    = 0x10000	    
   };
 
   int            n_bases;

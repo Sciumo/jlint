@@ -2,6 +2,18 @@
 #define TYPES_HH
 
 #include <string>
+
+#ifdef HASH_TABLE
+#include <hash_map>
+#else
+#include <map>
+#endif
+#ifdef HASH_TABLE
+  typedef hash_map<const char *, int, hash<const char *>, equal_to<const char *> > monitor_table;
+#else
+  typedef map<const char *, int, less<const char *> > monitor_table;
+#endif
+
 #include <stddef.h>
 
 typedef int      int4;
@@ -121,6 +133,8 @@ struct msg_select_category_option {
   const char*      cat_desc;
 };
 
+class field_desc;
+
 struct vbm_operand { 
   int  type;  // type of expression/variable before it was pushed in stack
   int4 max;   // maximal value of operand
@@ -128,6 +142,7 @@ struct vbm_operand {
   int4 mask;  // mask of possible set bits and zero value indicator for 
   // object types
   int  index; // index of local veriable, which value was loaded in stack
+  field_desc* equals;
 };
 
 #define IS_INT_TYPE(tp) (tp <= tp_int)

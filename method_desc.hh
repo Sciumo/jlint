@@ -20,8 +20,9 @@ class callee_desc;
 #include "access_desc.hh"
 class local_context;
 
-class method_desc : public component_desc { 
- public:
+class method_desc : public component_desc {
+  
+public:
   utf_string     desc;
   method_desc*   next;
 
@@ -36,7 +37,7 @@ class method_desc : public component_desc {
     m_wait         = 0x010000, // invoke wait()
     m_serialized   = 0x020000, // method is called only from methods 
     // of related classes
-    m_concurrent   = 0x040000, // Method is either run of Runanble protcol
+    m_concurrent   = 0x040000, // Method is either run of Runnable protocol
     // or synchronized or called from them.
     m_visited      = 0x080000, // Used while recursive traversal of methods
     m_deadlock_free= 0x100000, // Doesn't call any synchronized methods
@@ -110,7 +111,7 @@ class method_desc : public component_desc {
 
   void basic_blocks_analysis();
 
-  void parse_code(constant** constant_pool);
+  void parse_code(class_desc* cls, constant** constant_pool);
 
   method_desc(utf_string const& mth_name, utf_string const& mth_desc, 
               class_desc* cls_desc, method_desc* chain) 

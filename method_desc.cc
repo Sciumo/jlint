@@ -326,8 +326,8 @@ void method_desc::add_to_concurrent_closure(callee_desc* caller,
 void method_desc::build_concurrent_closure()
 {
   //
-  // Check if "run" method of class implemented Runnable interface
-  // is sycnhronized and mark this method as concurrent.
+  // Check if "run" method of class implementing Runnable interface
+  // is synchronized and mark this method as concurrent.
   //
   int caller_attr = 0;
   attr |= m_visited;
@@ -608,19 +608,23 @@ void method_desc::basic_blocks_analysis()
   }
 }
 
-void method_desc::parse_code(constant** constant_pool)
+void method_desc::parse_code(class_desc* this_class, 
+                             constant** constant_pool)
 {
   const int indirect = 0x100;
   byte* pc = code;
   byte* end = pc + code_length;
   const int max_stack_size = 256;
   vbm_operand stack[max_stack_size+2];
+  int i;
+  for (i = 0; i < max_stack_size+2; i++) {
+    stack[i].equals = NULL;
+  }
   vbm_operand* stack_bottom = stack+2; // avoid checks for non-empty stack
   vbm_operand* sp = stack_bottom;
   local_context* ctx;
   byte prev_cop = nop;
   bool super_finalize = false;
-  int i;
 #ifdef INT8_DEFINED
   int8 left_min;
   int8 left_max;
@@ -642,7 +646,7 @@ void method_desc::parse_code(constant** constant_pool)
 #endif
 
   in_monitor = false;
-  stack[0].type =  stack[1].type = tp_void;
+  stack[0].type = stack[1].type = tp_void;
   basic_blocks_analysis();
 
   for (i = 0; i < 32; i++) { 
@@ -663,6 +667,9 @@ void method_desc::parse_code(constant** constant_pool)
     vars[0].max = MAX_ARRAY_LENGTH;
   }
 
+  // init. is_new and is_this
+  field_desc* is_new = new field_desc(utf_string("<new>"), NULL, NULL);
+  field_desc* is_this = new field_desc(utf_string("<this>"), NULL, NULL);
   while (pc < end) { 
     int addr = pc - code;
     byte cop = *pc++; 
@@ -808,6 +815,7 @@ void method_desc::parse_code(constant** constant_pool)
 	    sp->mask = vars[*pc].mask;
 	    sp->min  = vars[*pc].min;
 	    sp->max  = vars[*pc].max;
+      sp->equals = vars[*pc].equals;
 	    sp->index = *pc++;
 	    sp += 1;
 	    break;
@@ -919,6 +927,7 @@ void method_desc::parse_code(constant** constant_pool)
 	  case aload_3:
 	    { 
 	      var_desc* var = &vars[cop - aload_0];
+        sp->equals = vars[cop - aload_0].equals;
 	      if (var->type == tp_void) { 
           if (cop == aload_0 && !(attr & m_static)) { 
             var->type = tp_self;
@@ -930,11 +939,22 @@ void method_desc::parse_code(constant** constant_pool)
           sp->min  = 0;
           sp->max  = MAX_ARRAY_LENGTH;
 	      }
+        if (cop == aload_0 && !(attr & m_static)) { 
+          sp->equals = is_this;
+        }
 	      sp->type = var->type;
 	      sp->mask = var->mask;
 	      sp->min  = var->min;
 	      sp->max  = var->max;
 	      sp->index = cop - aload_0;
+#ifdef DUMP_MONITOR
+        printf("<stack_top_%d> := %x %s\n",
+               cop-aload_0,
+               sp->equals,
+               sp->equals == NULL ? 
+               "<unknown>" : sp->equals->name.as_asciz()
+               );
+#endif
 	      sp += 1;
 	    }
 	    break;
@@ -1056,6 +1076,7 @@ void method_desc::parse_code(constant** constant_pool)
 	    if (vars[cop - astore_0].type == tp_void) { 
         vars[cop - astore_0].type = tp_object;
 	    }
+      vars[cop - astore_0].equals = sp->equals;
 	    var_store_count[cop - astore_0] += 1;
 	    break;
 	  case fstore_0:
@@ -1107,7 +1128,7 @@ void method_desc::parse_code(constant** constant_pool)
 	  case pop2:
 	    sp -= 2;
 	    break;
-	  case dup_x0:
+	  case dup_x0:      
 	    *sp = *(sp-1); sp += 1;
 	    break;
 	  case dup_x1:
@@ -1127,7 +1148,7 @@ void method_desc::parse_code(constant** constant_pool)
 	    sp[1]=sp[-1]; sp[0]=sp[-2]; sp[-1]=sp[-3]; sp[-2] = sp[-4]; 
 	    sp[-3]=sp[1]; sp[-4] = sp[0]; sp += 2;
 	    break;
-	  case swap:
+	  case Jswap:
 	    { 
 	      vbm_operand tmp = sp[-1]; 
 	      sp[-1] = sp[-2]; 
@@ -2227,6 +2248,7 @@ void method_desc::parse_code(constant** constant_pool)
             } 
             if (sp->mask & var_desc::vs_new) { 
               accessors->attr |= access_desc::a_new;
+              sp->equals = is_new;
             } 
           }
 	      }
@@ -2241,6 +2263,7 @@ void method_desc::parse_code(constant** constant_pool)
           sp->min = 0;
           sp->max = MAX_ARRAY_LENGTH;
 	      }
+        sp->equals = field;
 	      sp->index = NO_ASSOC_VAR;
 	      sp += 1;
 	      if (type == tp_long || type == tp_double) { 
@@ -2254,6 +2277,13 @@ void method_desc::parse_code(constant** constant_pool)
           sp += 1;
 	      }
 	      pc += 2;
+#ifdef DUMP_MONITOR
+        printf("<stack_top> := %x %s\n", 
+               field,
+               field == NULL ? 
+               "<unknown>" : field->name.as_asciz()
+               );
+#endif
 	    }
 	    break;
 	  case putfield:
@@ -2279,6 +2309,7 @@ void method_desc::parse_code(constant** constant_pool)
 	      }
 	      int type = get_type(*desc);
 	      sp -= (type == tp_long || type == tp_double) ? 2 : 1;
+        field->equals = sp->equals;
 	      if (cop == putfield) { 
           sp -= 1;
           if (!in_monitor) { 
@@ -2286,11 +2317,23 @@ void method_desc::parse_code(constant** constant_pool)
               accessors->attr |= access_desc::a_self;
             }
             if (sp->mask & var_desc::vs_new) { 
-              accessors->attr |= access_desc::a_new;
+              accessors->attr |= access_desc::a_new; 
             }
           }
           check_variable_for_null(addr, sp);
 	      }
+        if (sp->mask & var_desc::vs_new) {
+          field->equals = is_new;
+        }
+#ifdef DUMP_MONITOR
+        printf("%x %s := %x %s\n", 
+               field, 
+               field_name->as_asciz(),
+               field->equals,
+               field->equals == NULL ? 
+               "<unknown>" : field->equals->name.as_asciz()
+               );
+#endif
 	      pc += 2;
 	    }
 	    break;	    
@@ -2308,25 +2351,47 @@ void method_desc::parse_code(constant** constant_pool)
           (const_name_and_type*)constant_pool[method_ref->name_and_type];
 	      utf_string mth_name(*(const_utf8*)constant_pool[nt->name]);
 	      utf_string mth_desc(*(const_utf8*)constant_pool[nt->desc]);
-	      if (cls_name == "java/lang/Object") { 
-          if (!(attr & m_synchronized) &&
-              (mth_name == "notify" 
-               || mth_name == "notify_all" 
-               || mth_name == "wait"))
-            {
-              message(msg_wait_nosync, addr, &mth_name);
-            }
-          if (mth_name == "wait") { 
-            wait_line = get_line_number(addr);
-            attr |= m_wait;
-          }
-	      }
+
 	      int n_params = get_number_of_parameters(mth_desc);
 	      int fp = n_params;
 	      if (cop != invokestatic) { 
           fp += 1;
           check_variable_for_null(addr, sp-fp);
 	      }  
+#ifdef DUMP_MONITOR
+        printf("<stack_top> = %s\n",
+               sp[-fp].equals == NULL ? 
+               "<unknown>" : sp[-fp].equals->name.as_asciz()
+               );
+#endif
+	      if (cls_name == "java/lang/Object") { 
+          if (!(attr & m_synchronized) &&
+              (mth_name == "notify" 
+               || mth_name == "notify_all" 
+               || mth_name == "wait"))
+            {
+              // check whether monitor on object which is waited on is owned
+              bool hold_lock = false;
+              if (sp[-fp].equals != NULL) {
+                char* wait_on = sp[-fp].equals->name.as_asciz();
+                monitor_table::const_iterator entry = 
+                  this_class->monitors.find(wait_on);
+                if (entry != this_class->monitors.end()) {
+                  hold_lock = true;
+#ifdef DUMP_MONITOR
+                  printf("%s: %d\n", entry->first, entry->second);
+#endif
+                }                
+              }
+              if (!hold_lock) {
+                message(msg_wait_nosync, addr, &mth_name);
+              }
+            }
+          if (mth_name == "wait") { 
+            wait_line = get_line_number(addr);
+            attr |= m_wait;
+          }
+	      }
 	      if (cop == invokespecial) { 
           if (mth_name == "finalize") { 
             super_finalize = true;
@@ -2394,6 +2459,7 @@ void method_desc::parse_code(constant** constant_pool)
 	    sp->min = 0;
 	    sp->max = MAX_ARRAY_LENGTH;
 	    sp->index = NO_ASSOC_VAR;
+      sp->equals = is_new;
 	    sp += 1;
 	    pc += 2;
 	    break;
@@ -2453,14 +2519,35 @@ void method_desc::parse_code(constant** constant_pool)
 	    pc += 2;
 	    break;
 	  case monitorenter:
-	    in_monitor += 1;
-	    sp -= 1;
+      {
+        in_monitor += 1;
+        sp -= 1;
+        if (sp->equals != NULL) {
+          this_class->monitors.insert(
+            monitor_table::value_type(sp->equals->name.as_asciz(), 1));
+          // mark monitor ownership; use monitor count in later version
+        }
+#ifdef DUMP_MONITOR
+        printf("%s acquires monitor on %s\n", 
+               this_class->name.as_asciz(),
+               sp->equals == NULL ? 
+               "<unknown>" : sp->equals->name.as_asciz()
+               );
+#endif  
+      }    
 	    break;
 	  case monitorexit:
-	    if (in_monitor > 0) { 
-        in_monitor -= 1;
-	    }
-	    sp -= 1;
+      {
+        if (in_monitor > 0) { 
+          in_monitor -= 1;
+        }
+        sp -= 1;
+        monitor_table::iterator entry = 
+          this_class->monitors.find(sp->equals->name.as_asciz());
+        if (entry != this_class->monitors.end()) {
+          this_class->monitors.erase(entry);
+        }
+      }
 	    break;
 	  case wide:
 	    switch (*pc++) { 
@@ -2478,6 +2565,7 @@ void method_desc::parse_code(constant** constant_pool)
           sp->max =  var->max; 
           sp->mask = var->mask; 
           sp->index = var - vars;
+          sp->equals = var->equals;
           sp += 1;
         }
         break;

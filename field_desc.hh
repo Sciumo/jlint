@@ -6,7 +6,7 @@
 #include "utf_string.hh"
 
 class field_desc : public component_desc { 
- public:
+public:
   field_desc*    next;
   int            attr;
   enum { 
@@ -17,15 +17,18 @@ class field_desc : public component_desc {
     f_used       = 0x10000,
     f_serialized = 0x20000 // field is accessed only from methods 
     // of related classes
-  };  
+  };
+
+  field_desc* equals; // value that has been assigned, or null/unknown
 
   field_desc(utf_string const& field_name, class_desc* owner, 
              field_desc* chain) 
     : component_desc(field_name, owner)
-    {
-      next = chain; 
-      attr = f_serialized;
-    }
+  {
+    equals = NULL;
+    next = chain; 
+    attr = f_serialized;
+  }
 };
 
 #endif

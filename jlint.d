@@ -1,3 +1,4 @@
+// renamed swap to avoid conflict with STL swap
 JAVA_INSN(0, nop, 1)
 JAVA_INSN(1, aconst_null, 1)
 JAVA_INSN(2, iconst_m1, 1)
@@ -93,7 +94,7 @@ JAVA_INSN(91, dup_x2, 1)
 JAVA_INSN(92, dup2_x0, 1)
 JAVA_INSN(93, dup2_x1, 1)
 JAVA_INSN(94, dup2_x2, 1)
-JAVA_INSN(95, swap, 1)
+JAVA_INSN(95, Jswap, 1)
 JAVA_INSN(96, iadd, 1)
 JAVA_INSN(97, ladd, 1)
 JAVA_INSN(98, fadd, 1)

@@ -20,7 +20,7 @@ class callee_desc {
   int            attr;
   enum { 
     i_self          = 0x01, // invoke method of self class
-    i_synchronized  = 0x02, // method os invoked from synchronized(){} body
+    i_synchronized  = 0x02, // method is invoked from synchronized(){} body
     i_wait_deadlock = 0x04  // invocation can cause deadlock in wait()
   };
     

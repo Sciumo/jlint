@@ -7,16 +7,17 @@ CPP=g++
 
 # if you use egcs-2.90.* version of GCC please add option -fno-exceptions 
 # to reduce code size and increase performance
+# remove -DHASH_TABLE for really old systems without SGI's hash implementations
 
 # Debug version
-#CFLAGS = -c -Wall -O0 -g 
-CFLAGS = -c -Wall -O0 -g -DDUMP_EDGES -DDUMP_BYTE_CODES -DPRINT_PC
+#CFLAGS = -c -Wall -O0 -g -DHASH_TABLE
+CFLAGS = -c -Wall -O0 -g -DHASH_TABLE -DDUMP_EDGES -DDUMP_BYTE_CODES -DPRINT_PC -DDUMP_MONITOR -DDEBUG
 
 # Optimized version
-#CFLAGS = -c -Wall -O2 -g
+#CFLAGS = -c -Wall -O2 -g -DHASH_TABLE
 
 # Optimized version with switched off asserts
-#CFLAGS = -c -Wall -O2 -g -DNDEBUG
+#CFLAGS = -c -Wall -O2 -g -DNDEBUG -DHASH_TABLE
 
 LFLAGS=-g
 

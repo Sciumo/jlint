@@ -1,8 +1,8 @@
 //
 //MSG(category, code, pos, text) 
 //
-// Macro parameter "pos" is 1 if message is position dependetn and it's 
-// location should be included in history, otherwize if 0 - message is position
+// Macro parameter "pos" is 1 if message is position dependent and it's 
+// location should be included in history, otherwise if 0 - message is position
 // independent and fully qualified by code and parameters.
 //
 // Parameters %0s and %1d are used for file name and line number within file,
