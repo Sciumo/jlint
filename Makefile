@@ -267,8 +267,8 @@ locks.o: locks.cc \
 
 message_node.o: message_node.cc \
 	message_node.hh \
-	types.hh \
 	functions.hh \
+	types.hh \
 	jlint.d \
 	jlint.msg
 	$(CPP) $(CFLAGS) message_node.cc

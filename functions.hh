@@ -3,7 +3,7 @@
 #ifndef FUNCTIONS_HH
 #define FUNCTIONS_HH
 
-#include "stdio.h"
+#include <stdio.h>
 #include "types.hh"
 #include <stdarg.h>
 class utf_string;
