@@ -5,7 +5,7 @@
 @c
 @c Original version (1.11) by Konstantin Knizhnik.
 @c Enhanced version (2.0) and a few bug fixes by Cyrille Artho.
-@c Version 2.1: FreeBSD port by Cyrille Artho, Visual C++ port by Maarten Braddels.
+@c Version 2.1: FreeBSD port by Cyrille Artho, Visual C++ port by Maarten Breddels.
 @c
 @c This program is free software; you can redistribute it and/or
 @c modify it under the terms of the GNU General Public

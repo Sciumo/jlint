@@ -9,7 +9,7 @@ CPP=g++
 # Hints:
 # if you use egcs-2.90.* version of GCC please add option -fno-exceptions 
 # to reduce code size and increase performance
-# remove -DHASH_TABLE and -DSLIST for really old systems without SGI's hash implementations
+# remove -DSLIST for really old systems without SGI's STL implementations
 ###############################################################################
 
 # Debug version
@@ -18,10 +18,11 @@ CPP=g++
 
 # Optimized version
 
-CFLAGS = -c -Wall -O2 -g -DSLIST -DHASH_TABLE
+CFLAGS = -c -Wall -O2 -g -DSLIST
+# add -DHASH_TABLE for extra speed (may sometimes produce inconsistent results)
 
 # Optimized version with switched off asserts
-#CFLAGS = -c -Wall -O2 -g -DSLIST -DNDEBUG -DHASH_TABLE
+#CFLAGS = -c -Wall -O2 -g -DSLIST -DNDEBUG
 
 LFLAGS=-g
 

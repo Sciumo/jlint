@@ -1,5 +1,5 @@
 //-< JLINT.CC >------------------------------------------------------+--------+
-// Jlint                      Version 2.1        (c) 1998  GARRET    |     ?  |
+// Jlint                      Version 2.2        (c) 1998  GARRET    |     ?  |
 // (Java Lint)                                                       |   /\|  |
 //                                                                   |  /  \  |
 //                          Created:     28-Mar-98    K.A. Knizhnik  | / [] \ |
@@ -53,10 +53,6 @@ unsigned int string_hash_function(byte* p) {
   }
   return h;
 }
-
-#ifndef VISUAL_CPP
-message_node* message_node::hash_table[1023];
-#endif
 
 //
 // Functions for extracting information from type descriptors
