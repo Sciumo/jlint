@@ -1,5 +1,5 @@
 //-< JLINT.H >-------------------------------------------------------+--------+
-// Jlint                      Version 1.2        (c) 1998  GARRET    |     ?  |
+// Jlint                      Version 2.0        (c) 1998  GARRET    |     ?  |
 // (Java Lint)                                                       |   /\|  |
 //                                                                   |  /  \  |
 //                          Created:     28-Mar-98    K.A. Knizhnik  | / [] \ |
@@ -11,7 +11,7 @@
 #ifndef __JLINT_HH__
 #define __JLINT_HH__
 
-#define VERSION 1.2
+#define VERSION 2.0
 
 #include "types.hh"
 #include "message_node.hh"

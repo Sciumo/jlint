@@ -1,5 +1,5 @@
 //-< JLINT.CC >------------------------------------------------------+--------+
-// Jlint                      Version 1.2        (c) 1998  GARRET    |     ?  |
+// Jlint                      Version 2.0        (c) 1998  GARRET    |     ?  |
 // (Java Lint)                                                       |   /\|  |
 //                                                                   |  /  \  |
 //                          Created:     28-Mar-98    K.A. Knizhnik  | / [] \ |
