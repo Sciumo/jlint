@@ -34,6 +34,10 @@ class utf_string;
 #ifdef VISUAL_CPP
 #define __VALIST va_list
 #endif
+// so does alpha
+#ifdef __alpha__
+#define __VALIST va_list
+#endif
 
 // Fix for g++3.2, not needed for g++3.0 or lower. g++3.1?? 
 #ifdef __GNUC__
