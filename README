@@ -1,0 +1,25 @@
+Jlint README
+------------
+
+Jlint will check your Java code and find bugs, inconsistencies and
+synchronization problems by doing data flow analysis and building a lock graph.
+
+Original version (1.11) by Konstantin Knizhnik.
+Enhanced version (1.2) and a few bugfixes by Cyrille Artho.
+
+User guide is found in readme.html.
+
+System requirements:
+For compiling:	C++ compiler, C++ Standard Library with Standard Templates.
+For using:	Any Java compiler (no Java Run Time Environment needed).
+
+Installation:
+1. Unpack the archive with unzip jlint.zip (MS-DOS) or
+   gunzip -c jlint.tar.gz | tar -xvf -
+2. cd jlint
+3. make
+
+If Jlint won't compile for your system, remove the flags -DHASH_TABLE and
+-DSLIST in the Makefile, or upgrade to a newer version of the STL.
+
+Send bug reports to cyrille@artho.com, Subject: Jlint.
