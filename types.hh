@@ -8,7 +8,6 @@
 
 #include <string>
 #include <vector>
-
 #include <stddef.h>
 
 typedef int      int4;
