@@ -53,6 +53,7 @@ doc: manual.texi
 	texi2html -monolithic manual.texi; texi2pdf manual.texi
 
 dist: doc targz zip
+	chmod 644 ../jlint-*.{tar.gz,zip}
 
 targz:
 	if [ $(VERSION) != `grep VERSION jlint.hh | sed 's/.*N //'` ]; then echo "Check version numbers!"; exit 1; fi
