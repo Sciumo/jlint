@@ -11,16 +11,20 @@ User guide is found in readme.html.
 
 System requirements:
 For compiling:	C++ compiler, C++ Standard Library with Standard Templates.
-For compiling the docs: Texinfo. If not present, use "make antic jlint".
+For compiling the docs: Texinfo; type "make doc".
 For using:	Any Java compiler (no Java Run Time Environment needed).
+Recommended:	A Unix shell (e. g. bash) to run jlint.sh.
 
 Installation:
 1. Unpack the archive with unzip jlint.zip (MS-DOS) or
    gunzip -c jlint.tar.gz | tar -xvf -
 2. cd jlint
-3. make
+3. make ; make install
 
 If Jlint won't compile for your system, remove the flags -DHASH_TABLE and
 -DSLIST in the Makefile, or upgrade to a newer version of the STL.
+
+Developer info: you can update the Makefile by typing
+./mkmf.pl jlint antic <Makefile >__tmp__ ; mv __tmp__ Makefile
 
 Send bug reports to cyrille@artho.com, Subject: Jlint.

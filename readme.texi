@@ -436,6 +436,19 @@ into several categories, which contains one or more messages.
 Such scheme of message classification is used to support
 fine-grained selection of reported messages.
 
+Because only categories of message can be disabled, but not seperate messages, a short shell script is supplied that will suppress certain warnings that are less important. It should be noted that it will ignore any race conditions for variables. This is because Jlint does not have any notion of "shared reading", so it usually produces too many warnings about such data races to be useful. For some projects, using Jlint's output unfiltered can still be useful.
+
+The shell script is as follows:
+@example
+@include jlint.sh
+@end example
+
+It is probably more easier to run Jlint using those filters, with
+@example
+cd <dir_with_class_files>
+jlint.sh
+@end example
+
 @node Synchronization, Inheritance, , Bugs detected by Jlint
 
 @section Synchronization
