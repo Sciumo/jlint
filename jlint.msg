@@ -17,13 +17,14 @@
 MSG(deadlock,sync_loop,0,"Loop %2d: invocation of synchronized method %3m can cause deadlock")
 MSG(deadlock,loop,0,"Loop %2d/%3d: invocation of method %4m forms the loop in class dependency graph")
 MSG(deadlock,wait,0,"Method wait() can be invoked with monitor of other object locked")
+MSG(deadlock,locklist,0,"Holding %2d lock(s):%3s")
 MSG(deadlock,wait_path,0,"Call sequence to method %2m can cause deadlock in wait()")
 MSG(race_condition,nosync,0,"Synchronized method %2m is overridden by non-synchronized method of derived class '%3c'")
 MSG(race_condition,concurrent_call,0,"Method %2m can be called from different threads and is not synchronized")
 MSG(race_condition,concurrent_access,0,"Field '%2u' of class '%3c' can be accessed from different threads and is not volatile")
 MSG(race_condition,run_nosync,0,"Method %2m implementing 'Runnable' interface is not synchronized")
-MSG(wait_nosync,wait_nosync,0,"Method %2u is called from non-synchronized method")
-MSG(wait_nosync,wait_nosync_block,0,"Method '%2s.%3u' is called without synchronizing on '%2s'")
+// MSG(wait_nosync,wait_nosync,0,"Method %2u is called from non-synchronized method")
+MSG(wait_nosync,wait_nosync,0,"Method '%2s.%3u' is called without synchronizing on '%2s'")
 
 //
 // Inheritance

@@ -22,7 +22,7 @@
 
 #include "jlint.hh"
 
-int   verbose = false;
+bool   verbose = false;
 int   max_shown_paths = 4;
 
 //

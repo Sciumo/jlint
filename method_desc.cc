@@ -2384,42 +2384,65 @@ void method_desc::parse_code(class_desc* this_class,
                );
 #endif
         if (cls_name == "java/lang/Object") { 
-          if (!(attr & m_synchronized) &&
-              (mth_name == "notify" 
-               || mth_name == "notify_all" 
-               || mth_name == "wait"))
-            {
+          bool hold_lock = false;
+          char* wait_on;
+          if (sp[-fp].equals != NULL) { 
+            wait_on = sp[-fp].equals->name.as_asciz();
+          } else {
+            wait_on = NULL;
+          }
+          if (mth_name == "notify" 
+              || mth_name == "notify_all" 
+              || mth_name == "wait") { 
+            if (attr & m_synchronized) { // add "this" to lock set if needed
+              this_class->monitors.insert(monitor_table::value_type("<this>", 1));              
+              if (wait_on == "<this>") {
+                hold_lock = true;
+              }
+            }
+            // make sure thread holds only lock it should hold            
+            if (!(attr & m_synchronized)) {
               // check whether lock on object which is waited on is owned
-              bool hold_lock = false;
-              if (sp[-fp].equals != NULL) {
-                char* wait_on = sp[-fp].equals->name.as_asciz();
+              if (wait_on != NULL) {
                 monitor_table::const_iterator entry = 
                   this_class->monitors.find(wait_on);
                 if (entry != this_class->monitors.end()) {
                   hold_lock = true;
                 }
-#ifdef DUMP_MONITOR
-                entry = this_class->monitors.begin();
-                printf("Holding %d locks.\n", this_class->monitors.size());
-                while (entry != this_class->monitors.end()) {
-                  printf("--> %s\n", entry->first);
-                  entry++;
-                }
-#endif
-                if (!hold_lock) {
-                  message(msg_wait_nosync_block, addr, wait_on, &mth_name);
-                  hold_lock = true; // suppress next warning
-                }
-              }
-              if (!hold_lock) {
-                message(msg_wait_nosync, addr, &mth_name);
               }
             }
+            if (!hold_lock) {
+              message(msg_wait_nosync, addr, wait_on, &mth_name);
+            }
+          }
           if (mth_name == "wait") { 
             wait_line = get_line_number(addr);
             attr |= m_wait;
+            // check whether other locks are held
+            if (this_class->monitors.size() - (hold_lock? 1:0) > 0) {
+              message(msg_wait, addr);
+              if (verbose) { // print all other montors
+                char buf[100]; // buffer for locks
+                char* out = buf;
+                int n;
+                monitor_table::const_iterator entry = this_class->monitors.begin();
+                while (entry != this_class->monitors.end()) {
+                  if ((n = snprintf(out, sizeof(buf)-(out-buf), 
+                                    " %s,", entry->first)) == -1) {
+                    // no space in buffer left - print "..." at end of buffer
+                    sprintf(buf+sizeof(buf)-4, "...");
+                    out = buf + sizeof(buf) - 1;
+                    break;
+                  }
+                  out += n;
+                  entry++;
+                }
+                *(out-1) = '\0';
+                message(msg_locklist, addr, this_class->monitors.size(), buf);
+              }
+            }
           }
-        }
+        } // end of wait/notify treatment
         if (cop == invokespecial) { 
           if (mth_name == "finalize") { 
             super_finalize = true;
