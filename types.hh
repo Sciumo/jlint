@@ -31,10 +31,6 @@ typedef unsigned long nat8;
 #endif
 #endif
 
-#define bool  int
-#define true  1
-#define false 0
-
 #define nobreak 
 
 typedef unsigned char  byte;
