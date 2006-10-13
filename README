@@ -1,4 +1,4 @@
-Jlint 3.0 README
+Jlint 3.1 README
 ----------------
 
 Description:
@@ -19,6 +19,9 @@ Eric A. Raymond; OpenBSD patch by Kevin Lo. LinuxPPC and MacOS X port
 Version 3.0: works with java 1.4, added test framework by Raphael 
 Ackermann; Support for compressed zip/jar files by Mark Wutka; Patch for 
 class_desc.cc by Jeroen Mostert
+
+Version 3.1: Added minor patch to fix compilation issues with g++ 3.2
+and newer.
 
 Usage:
 ------
@@ -48,7 +51,7 @@ Makefile, or upgrade to a newer version of the STL.
 To have .cc files be recognized as C++ source code, check out
 http://support.microsoft.com/support/kb/articles/Q181/5/06.ASP
 
-- MacOS X users:
+- MacOS X users (old versions of MacOS X):
 
 In the first few lines of the Makefile (lines 6 and 7), replace
 gcc with cc, and g++ with c++. Alternatively, you can create a symbolic link
