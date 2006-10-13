@@ -1,5 +1,9 @@
 Jlint changelog:
 
+Version 3.1: Minor patch in types.hh to fix compilation problems.
+
+Version 3.0: See jlint_3.0.tex.
+
 Version 2.3: (Trivial) port to LinuxPPC and Mac OS X.
 
 Version 2.2: Applied Eric A. Raymond's compiler compatibility
