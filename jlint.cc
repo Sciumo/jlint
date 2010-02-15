@@ -151,7 +151,7 @@ void format_message(int code, utf_string const& file, int line, __VALIST ap)
     if (compound_message != NULL
         && ((loop_id != 0 
              && ((code != msg_loop && code != msg_sync_loop)
-                 || (int)parameter[2] != loop_id))
+                 || (int)(long)parameter[2] != loop_id))
             || (loop_id == 0 && code != msg_wait_path)))
       {
         if (!message_node::find(compound_message)) { 
@@ -226,7 +226,7 @@ void format_message(int code, utf_string const& file, int line, __VALIST ap)
                            name.as_asciz()); 
             break;
           case 'd': // integer
-            dst += sprintf(dst, "%d", (int)parameter[index]);  
+            dst += sprintf(dst, "%d", (int)(long)parameter[index]);  
             break;
           default:
             assert(false/*bad message parameter format*/);
@@ -238,7 +238,7 @@ void format_message(int code, utf_string const& file, int line, __VALIST ap)
                 && (code != msg_loop || index > 3))
               {
                 // Do not inlude loop number in history message
-                hp += sprintf(hp, ":%.*s", dst - save_dst, save_dst);
+                hp += sprintf(hp, ":%.*s", (int)(dst - save_dst), save_dst);
               }
           }
         } else { 
@@ -262,7 +262,7 @@ void format_message(int code, utf_string const& file, int line, __VALIST ap)
               compound_message = strdup(his_buf);
               first = last = new message_node(msg_buf);
               if (code != msg_wait) { 
-                loop_id = (int)parameter[2];
+                loop_id = (int)(long)parameter[2];
               }
             } else if (!message_node::find(his_buf)) { 
               fprintf(stdout, "%s\n", msg_buf);
