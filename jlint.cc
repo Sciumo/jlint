@@ -297,7 +297,7 @@ void set_class_source_path(class_desc* cls)
   if (source_file_path_len != 0) { 
     const char* class_file_name = cls->source_file.as_asciz();
     if (!source_path_redefined) { 
-      char* dirend = strrchr(class_file_name, '/');
+      const char* dirend = strrchr(class_file_name, '/');
       if (dirend != NULL) { 
         int dirlen = dirend - class_file_name;
         if (dirlen <= source_file_path_len
@@ -1040,8 +1040,8 @@ int main(int argc, char* argv[])
         verbose = enabled;
         if (verbose) { 
           fprintf(stderr, 
-                  "Jlint - program correctness verifier for Java"
-                  "        version %3.2f ("__DATE__")\n", VERSION);  
+                  "Jlint - program correctness verifier for Java, "
+                  "version %s ("__DATE__").\n", VERSION);
         }
         continue;
       }

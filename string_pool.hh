@@ -1,6 +1,8 @@
 #ifndef STRING_POOL_HH
 #define STRING_POOL_HH
 
+#include <cstdlib>
+
 #ifdef __GNUC__
 #if __GNUC__ > 2
 using namespace std;

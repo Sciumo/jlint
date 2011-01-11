@@ -5,7 +5,7 @@
 //   Created:                    28-Mar-98    K.A. Knizhnik          | / [] \ |
 //   Version 2.X:   Last update: 08-Aug-01    Cyrille Artho          | GARRET |
 //   Version 3.0:   Last update: 20-Jul-03    Raphael Ackermann      |        |
-//   Version 3.1:   Last update: 13-Oct-06    Cyrille Artho          |        |
+//   Version 3.1.X: Last update: 11-Jan-11    Cyrille Artho          |        |
 //-------------------------------------------------------------------+--------+
 // Java verifier 
 //-------------------------------------------------------------------+--------+
@@ -13,7 +13,7 @@
 #ifndef __JLINT_HH__
 #define __JLINT_HH__
 
-#define VERSION 3.1
+#define VERSION "3.1.2"
 
 #include "types.hh"
 #include "message_node.hh"

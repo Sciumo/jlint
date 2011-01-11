@@ -23,6 +23,9 @@ class_desc.cc by Jeroen Mostert
 Version 3.1: Added minor patch to fix compilation issues with g++ 3.2
 and newer.
 
+Version 3.1.X: Other patches to address compilation on newer compilers.
+Patch for version 3.1.2 contributed by Paul Roemer, tested on g++ 4.2.
+
 Usage:
 ------
 User guide is found in manual.html.

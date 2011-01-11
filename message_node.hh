@@ -3,6 +3,7 @@
 //#include <string>
 //#include "types.hh" // included by functions.hh
 #include "functions.hh"
+#include <cstring>
 
 class message_node {
   static message_node* hash_table[];
